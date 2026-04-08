@@ -33,7 +33,7 @@ export const auth = (...allowedRoles: Role[]): RequestHandler =>
 
     req.user = {
       userId: user.id,
-      tenantId: user.tenantId,
+      tenantId: user.tenantId!,
       role: user.role as Role,
     };
 

@@ -1,14 +1,14 @@
 export const healthPaths = {
-  '/health': {
+  '/': {
     get: {
       tags: ['Health'],
-      summary: 'Get service health status',
+      summary: 'Get root status response',
       responses: {
         '200': {
-          description: 'Service is healthy',
+          description: 'Service responded successfully',
           content: {
             'application/json': {
-              schema: { $ref: '#/components/schemas/HealthResponse' },
+              schema: { $ref: '#/components/schemas/RootHealthResponse' },
             },
           },
         },

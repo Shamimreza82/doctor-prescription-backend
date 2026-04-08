@@ -7,6 +7,7 @@ export const authSchemas = {
       email: { type: 'string', format: 'email', example: 'john@example.com' },
       phone: { type: 'string', example: '+8801712345678' },
       password: { type: 'string', minLength: 6, example: 'secret123' },
+      publicId: { type: 'string', example: 'usr_public_123' },
       roleId: { type: 'string', format: 'uuid' },
       tenantId: { type: 'string', format: 'uuid' },
     },
@@ -23,22 +24,28 @@ export const authSchemas = {
     type: 'object',
     properties: {
       success: { type: 'boolean', example: true },
-      message: { type: 'string', example: 'User registered successfully' },
-      data: { type: 'object', nullable: true },
+      message: { type: 'string', example: 'Register successful' },
+      data: {
+        type: 'object',
+        nullable: true,
+        additionalProperties: true,
+      },
+      meta: { type: 'object', nullable: true, additionalProperties: true },
     },
   },
   AuthLoginResponse: {
     type: 'object',
     properties: {
       success: { type: 'boolean', example: true },
-      message: { type: 'string', example: 'User logged in successfully' },
+      message: { type: 'string', example: 'Login successful' },
       data: {
         type: 'object',
         properties: {
           accessToken: { type: 'string', example: 'jwt-access-token' },
-          user: { type: 'object', nullable: true },
+          user: { $ref: '#/components/schemas/AuthUser' },
         },
       },
+      meta: { type: 'object', nullable: true, additionalProperties: true },
     },
   },
   AuthRefreshResponse: {
@@ -52,6 +59,20 @@ export const authSchemas = {
           accessToken: { type: 'string', example: 'jwt-access-token' },
         },
       },
+      meta: { type: 'object', nullable: true, additionalProperties: true },
+    },
+  },
+  AuthUser: {
+    type: 'object',
+    nullable: true,
+    additionalProperties: true,
+    properties: {
+      id: { type: 'string', format: 'uuid', example: '9be8ec9b-39fe-43e6-bf7b-7ce16bdcb9e5' },
+      name: { type: 'string', example: 'John Doe' },
+      email: { type: 'string', format: 'email', example: 'john@example.com' },
+      phone: { type: 'string', example: '+8801712345678' },
+      role: { type: 'string', example: 'DOCTOR' },
+      tenantId: { type: 'string', format: 'uuid', nullable: true },
     },
   },
 };

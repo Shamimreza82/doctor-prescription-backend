@@ -1,16 +1,16 @@
 export const healthSchemas = {
-  HealthResponse: {
+  RootHealthResponse: {
     type: 'object',
     properties: {
       success: { type: 'boolean', example: true },
-      message: { type: 'string', example: 'Health check successful' },
+      message: { type: 'string', example: 'api work file' },
       data: {
-        type: 'object',
-        properties: {
-          status: { type: 'string', example: 'ok' },
-          uptime: { type: 'number', example: 123.45 },
-          timestamp: { type: 'string', format: 'date-time' },
-        },
+        type: 'null',
+        example: null,
+      },
+      meta: {
+        type: 'null',
+        example: null,
       },
     },
   },

@@ -1,4 +1,5 @@
 
+
 import bcrypt from 'bcrypt'
 
 import { prisma } from '@/bootstrap/prisma';
@@ -6,12 +7,13 @@ import { AppError } from '@/shared/errors/AppError';
 import { addDays } from '@/shared/utils/addDays';
 import { generateSlug } from '@/shared/utils/generateSlug';
 
-import { TDoctorRegisterInput } from './doctor.validation';
+import { TOnboardingInput } from './onboarding.validation';
 
 
 
 
-const createDoctor = async (payload: TDoctorRegisterInput) => {
+
+const createDoctor = async (payload: TOnboardingInput) => {
   const { email, password, name, phone, planCode } = payload;
 
   const plan = await prisma.plan.findUnique({
@@ -41,8 +43,8 @@ const createDoctor = async (payload: TDoctorRegisterInput) => {
     // all create logic here
     const tenant = await tx.tenant.create({
       data: {
-        name: `${payload.name} Workspace`,
-        slug: generateSlug(payload.name),
+        name: `${name} Workspace`,
+        slug: generateSlug(name),
         status: "ACTIVE",
         isTrial: true,
         trialStartsAt: new Date(),
@@ -51,7 +53,7 @@ const createDoctor = async (payload: TDoctorRegisterInput) => {
     });
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    const user = await tx.user.create({
+     await tx.user.create({
       data: {
         tenantId: tenant.id,
         name: name,
@@ -64,7 +66,7 @@ const createDoctor = async (payload: TDoctorRegisterInput) => {
     });
 
 
-    const tenantSetting = await tx.tenantSetting.create({
+    await tx.tenantSetting.create({
       data: {
         tenantId: tenant.id,
         timezone: "Asia/Dhaka",
@@ -80,7 +82,7 @@ const createDoctor = async (payload: TDoctorRegisterInput) => {
     const startsAt = new Date();
     const endsAt = addDays(startsAt, 7);
 
-    const subscription = await tx.subscription.create({
+    await tx.subscription.create({
       data: {
         tenantId: tenant.id,
         planId: plan.id,

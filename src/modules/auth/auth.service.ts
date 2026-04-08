@@ -25,7 +25,7 @@ const register = async (payload: TRegisterInput) => {
   const existingUser = await findUserByEmail(email);
 
   if (existingUser) {
-    throw new AppError(StatusCodes.CONFLICT, AUTH_MESSAGES.AUTH_MESSAGES.USER_ALREADY_EXISTS);
+    throw new AppError(StatusCodes.CONFLICT, AUTH_MESSAGES.USER_ALREADY_EXISTS);
   }
 
   const data: TRegisterInput = {
@@ -45,7 +45,7 @@ const login = async (payload: TLoginInput) => {
   const existingUser = await findUserByEmail(email);
 
   if (!existingUser) {
-    throw new AppError(StatusCodes.CONFLICT, AUTH_MESSAGES.AUTH_MESSAGES.USER_NOT_FOUND);
+    throw new AppError(StatusCodes.CONFLICT, AUTH_MESSAGES.USER_NOT_FOUND);
   }
 
   assertActiveUser(existingUser.status);
@@ -53,7 +53,7 @@ const login = async (payload: TLoginInput) => {
   const isPasswordValid = await comparePassword(password, existingUser.password);
 
   if (!isPasswordValid) {
-    throw new AppError(StatusCodes.CONFLICT, AUTH_MESSAGES.AUTH_MESSAGES.INVALID_CREDENTIALS);
+    throw new AppError(StatusCodes.CONFLICT, AUTH_MESSAGES.INVALID_CREDENTIALS);
   }
 
   const jwtPayload = {

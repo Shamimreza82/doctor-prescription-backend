@@ -3,6 +3,8 @@ export const authPaths = {
     post: {
       tags: ['Auth'],
       summary: 'Register a new user',
+      security: [{ bearerAuth: [] }],
+      description: 'Creates a user account. This route is currently restricted to SUPER_ADMIN users.',
       requestBody: {
         required: true,
         content: {
@@ -37,6 +39,7 @@ export const authPaths = {
     post: {
       tags: ['Auth'],
       summary: 'Login user',
+      description: 'Authenticates a user and sets the refresh token in an HTTP-only cookie.',
       requestBody: {
         required: true,
         content: {
@@ -50,6 +53,14 @@ export const authPaths = {
       responses: {
         '200': {
           description: 'User logged in successfully',
+          headers: {
+            'Set-Cookie': {
+              schema: {
+                type: 'string',
+              },
+              description: 'HTTP-only refresh token cookie.',
+            },
+          },
           content: {
             'application/json': {
               schema: { $ref: '#/components/schemas/AuthLoginResponse' },
@@ -83,6 +94,14 @@ export const authPaths = {
       responses: {
         '200': {
           description: 'Access token refreshed successfully',
+          headers: {
+            'Set-Cookie': {
+              schema: {
+                type: 'string',
+              },
+              description: 'Rotated HTTP-only refresh token cookie.',
+            },
+          },
           content: {
             'application/json': {
               schema: { $ref: '#/components/schemas/AuthRefreshResponse' },

@@ -5,8 +5,6 @@ import { prisma } from '@/bootstrap/prisma';
 export async function resetDatabase() {
   await prisma.$transaction([
     prisma.user.deleteMany(),
-    prisma.role.deleteMany(),
-    prisma.permission.deleteMany(),
   ]);
 }
 
