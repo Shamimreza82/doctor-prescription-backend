@@ -32,9 +32,6 @@ model Plan {
   @@map("plans")
 }
 
-
-
-
 model Subscription {
   id       String @id @default(uuid())
   tenantId String @map("tenant_id")

@@ -53,7 +53,7 @@ const createDoctor = async (payload: TOnboardingInput) => {
     });
     const hashedPassword = await bcrypt.hash(password, 12);
 
-     await tx.user.create({
+   const user = await tx.user.create({
       data: {
         tenantId: tenant.id,
         name: name,
@@ -62,6 +62,14 @@ const createDoctor = async (payload: TOnboardingInput) => {
         password: hashedPassword,
         role: "DOCTOR",
         status: "ACTIVE"
+      }
+    });
+
+    await tx.doctor.create({
+      data: {
+        tenantId: tenant.id,  
+        userId: user.id,
+        registrationNumber: `REG-${Math.floor(100000 + Math.random() * 900000)}`,
       }
     });
 
@@ -91,6 +99,7 @@ const createDoctor = async (payload: TOnboardingInput) => {
         endsAt,
       }
     });
+
 
 
   });

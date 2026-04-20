@@ -24,10 +24,11 @@ model Tenant {
   metadata  Json?
   deletedAt DateTime? @map("deleted_at")
 
-
   patients      Patient[]
+  prescriptions Prescription[]
   subscriptions Subscription[]
   settings      TenantSetting?
+  users         User[]
 
   createdAt    DateTime      @default(now()) @map("created_at")
   updatedAt    DateTime      @updatedAt @map("updated_at")

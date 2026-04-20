@@ -18,9 +18,11 @@ export interface TJwtPayload {
 
 export const refreshTokenCookieOptions = {
   httpOnly: true,
-  secure: true,
+  secure: envConfig.nodeEnv === 'production',
   sameSite: 'lax' as const,
+  path: '/',
 };
+
 
 export const findUserByEmail = async (email: string, tenantId?: string) => {
   return prisma.user.findFirst({

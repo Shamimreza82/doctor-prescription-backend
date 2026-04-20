@@ -1,0 +1,74 @@
+model Prescription {
+  id String @id @default(uuid())
+
+  tenantId String @map("tenant_id")
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  patientId String  @map("patient_id")
+  patient   Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  doctorId String @map("doctor_id")
+  doctor   Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+
+  visitId String? @map("visit_id")
+  visit   Visit?  @relation(fields: [visitId], references: [id], onDelete: SetNull)
+
+  prescriptionNumber String             @unique @map("prescription_number")
+  status             PrescriptionStatus @default(DRAFT)
+
+  diagnosis String?
+  symptoms  String?
+  advice    String?
+  notes     String?
+
+  followUpDate DateTime? @map("follow_up_date")
+  issuedAt     DateTime? @map("issued_at")
+  expiresAt    DateTime? @map("expires_at")
+
+  metadata  Json?
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  items PrescriptionItem[]
+
+  @@index([tenantId])
+  @@index([patientId])
+  @@index([doctorId])
+  @@index([visitId])
+  @@index([tenantId, status])
+  @@map("prescriptions")
+}
+
+model PrescriptionItem {
+  id String @id @default(uuid())
+
+  prescriptionId String       @map("prescription_id")
+  prescription   Prescription @relation(fields: [prescriptionId], references: [id], onDelete: Cascade)
+
+  medicineName  String  @map("medicine_name")
+  genericName   String? @map("generic_name")
+  dosage        String?
+  frequency     String?
+  durationValue Int?    @map("duration_value")
+  durationUnit  String? @map("duration_unit")
+  route         String?
+  instruction   String? @map("instruction")
+  quantity      String?
+  timing        String?
+  sortOrder     Int     @default(0) @map("sort_order")
+
+  metadata  Json?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([prescriptionId])
+  @@map("prescription_items")
+}
+
+enum PrescriptionStatus {
+  DRAFT
+  ISSUED
+  CANCELLED
+  COMPLETED
+}

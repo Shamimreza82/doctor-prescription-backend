@@ -32,6 +32,35 @@ const envSchema = z.object({
   REDIS_HOST: z.string().default('127.0.0.1'),
   REDIS_PORT: z.coerce.number().int().positive().default(6379),
   REDIS_PASSWORD: z.string().optional(),
+
+  // Ai models and api keys
+  GEMINI_API_KEY: z.string().optional(),
+  GEMINI_CHAT_MODEL: z.string().optional(),
+  GEMINI_TEXT_MODEL: z.string().optional(),
+  GEMINI_VISION_MODEL: z.string().optional(),
+  GEMINI_IMAGE_MODEL: z.string().optional(),
+  GEMINI_EMBEDDING_MODEL: z.string().optional(),
+
+  OPENAI_API_KEY: z.string().optional(),
+  OPENAI_CHAT_MODEL: z.string().optional(),
+  OPENAI_TEXT_MODEL: z.string().optional(),
+  OPENAI_VISION_MODEL: z.string().optional(),
+  OPENAI_IMAGE_MODEL: z.string().optional(),
+  OPENAI_EMBEDDING_MODEL: z.string().optional(),
+
+  CLAUDE_API_KEY: z.string().optional(),
+  CLAUDE_CHAT_MODEL: z.string().optional(),
+  CLAUDE_TEXT_MODEL: z.string().optional(),
+  CLAUDE_VISION_MODEL: z.string().optional(),
+  CLAUDE_IMAGE_MODEL: z.string().optional(),
+  CLAUDE_EMBEDDING_MODEL: z.string().optional(),
+
+  OLLAMA_API_URL: z.string().url().default('http://127.0.0.1:11434'),
+  OLLAMA_CHAT_MODEL: z.string().optional(),
+  OLLAMA_TEXT_MODEL: z.string().optional(),
+  OLLAMA_VISION_MODEL: z.string().optional(),
+  OLLAMA_EMBEDDING_MODEL: z.string().optional(),
+
 });
 
 const parsed = envSchema.safeParse(process.env);
@@ -67,4 +96,33 @@ export const envConfig = {
   redisHost: parsed.data.REDIS_HOST,
   redisPort: parsed.data.REDIS_PORT,
   redisPassword: parsed.data.REDIS_PASSWORD,
+
+
+  ///ai api keys and model names
+  geminiApiKey: parsed.data.GEMINI_API_KEY,
+  geminiChatModel: parsed.data.GEMINI_CHAT_MODEL,
+  geminiTextModel: parsed.data.GEMINI_TEXT_MODEL,
+  geminiVisionModel: parsed.data.GEMINI_VISION_MODEL,
+  geminiImageModel: parsed.data.GEMINI_IMAGE_MODEL,
+  geminiEmbeddingModel: parsed.data.GEMINI_EMBEDDING_MODEL,
+
+  openAiApiKey: parsed.data.OPENAI_API_KEY,
+  openAiChatModel: parsed.data.OPENAI_CHAT_MODEL,
+  openAiTextModel: parsed.data.OPENAI_TEXT_MODEL,
+  openAiVisionModel: parsed.data.OPENAI_VISION_MODEL,
+  openAiImageModel: parsed.data.OPENAI_IMAGE_MODEL,
+  openAiEmbeddingModel: parsed.data.OPENAI_EMBEDDING_MODEL,
+
+  claudeApiKey: parsed.data.CLAUDE_API_KEY,
+  claudeChatModel: parsed.data.CLAUDE_CHAT_MODEL,
+  claudeTextModel: parsed.data.CLAUDE_TEXT_MODEL,
+  claudeVisionModel: parsed.data.CLAUDE_VISION_MODEL,
+  claudeImageModel: parsed.data.CLAUDE_IMAGE_MODEL,
+  claudeEmbeddingModel: parsed.data.CLAUDE_EMBEDDING_MODEL,
+
+  ollamaApiUrl: parsed.data.OLLAMA_API_URL,
+  ollamaChatModel: parsed.data.OLLAMA_CHAT_MODEL,
+  ollamaTextModel: parsed.data.OLLAMA_TEXT_MODEL,
+  ollamaVisionModel: parsed.data.OLLAMA_VISION_MODEL,
+  ollamaEmbeddingModel: parsed.data.OLLAMA_EMBEDDING_MODEL,
 } as const;

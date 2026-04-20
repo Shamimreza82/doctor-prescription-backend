@@ -1,37 +1,28 @@
 model File {
-  id String @id @default(uuid())
-
+  id       String @id @default(uuid())
   tenantId String @map("tenant_id")
-  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
   uploadedById String? @map("uploaded_by_id")
   uploadedBy   User?   @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
 
-  fileName     String @map("file_name")
   originalName String @map("original_name")
   mimeType     String @map("mime_type")
-  extension    String
+  sizeBytes    Int    @map("size_bytes")
 
-  sizeBytes Int @map("size_bytes")
+  storageKey String @map("storage_key") // only file path
 
-  storageProvider String @map("storage_provider") // S3 / R2 / Local
-  storageKey      String @map("storage_key") // bucket path
+  entityType String @map("entity_type") // PATIENT, DOCTOR, PRESCRIPTION
+  entityId   String @map("entity_id")
 
-  bucket String?
-  url    String?
+  category String? // LAB_REPORT, PRESCRIPTION, PROFILE_IMAGE, NID, INVOICE
+  title    String? // "CBC Report", "X-Ray Chest", etc.
+  notes    String?
 
-  entityType String? @map("entity_type")
-  entityId   String? @map("entity_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
 
-  isPublic Boolean @default(false) @map("is_public")
-
-  checksum String?
-
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  deletedAt DateTime? @map("deleted_at")
-
-  @@index([tenantId])
-  @@index([entityType, entityId])
+  @@index([tenantId, entityType, entityId])
+  @@index([uploadedById])
   @@map("files")
 }

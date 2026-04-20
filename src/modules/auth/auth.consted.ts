@@ -9,6 +9,7 @@ export const AUTH_MESSAGES = {
   USER_ALREADY_EXISTS: 'User already exists',
   USER_NOT_FOUND: 'User not found',
   INVALID_REFRESH_TOKEN: 'Invalid refresh token',
+  ME_SUCCESS: 'User profile retrieved successfully',
 } as const;
 
 

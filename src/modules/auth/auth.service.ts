@@ -100,8 +100,28 @@ const refreshToken = async (token: string) => {
   };
 };
 
+const me = async (userId: string) => {
+  const existingUser = await findUserById(userId);
+
+  if (!existingUser) {
+    throw new AppError(StatusCodes.CONFLICT, AUTH_MESSAGES.USER_NOT_FOUND);
+  }
+
+  assertActiveUser(existingUser.status);
+
+  return {
+    userId: existingUser.id,
+    tenantId: existingUser.tenantId,
+    name: existingUser.name,
+    email: existingUser.email,
+    role: existingUser.role,
+  };
+};
+
 export const AuthServices = {
   login,
   register,
   refreshToken,
-};
+  me,
+};    
+

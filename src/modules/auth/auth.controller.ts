@@ -56,8 +56,20 @@ const refreshToken = catchAsync(async (req, res) => {
   });
 });
 
+const me = catchAsync(async (req, res) => {
+  const userId = req.user?.userId;
+  const result = await AuthServices.me(userId);
+
+  sendResponse(res, StatusCodes.OK, {
+    success: true,
+    message: AUTH_MESSAGES.ME_SUCCESS,
+    data: result,
+  });
+}); 
+
 export const AuthControllers = {
   login,
   register,
   refreshToken,
+  me,
 };

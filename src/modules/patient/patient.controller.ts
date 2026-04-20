@@ -5,12 +5,16 @@ import { sendResponse } from '@/shared/utils/sendResponse';
 
 import { PATIENT_MESSAGES } from './patient.constants';
 import { PatientServices } from './patient.service';
+import { generateText } from '../ai/ai.service';
+import { buildPatientAnalysisPrompt } from '../ai/prompt/build-patient-analysis.prompt';
 
 import type {
   TCreatePatientValidationInput,
   TListPatientsValidationInput,
   TUpdatePatientValidationInput,
 } from './patient.validation';
+
+
 
 const createPatient = catchAsync(async (req, res) => {
   const result = await PatientServices.createPatient(req.user, req.body as TCreatePatientValidationInput);
@@ -27,6 +31,14 @@ const listPatients = catchAsync(async (req, res) => {
     req.user,
     req.query as unknown as TListPatientsValidationInput,
   );
+
+  // const test = await generateText("gemini", {
+  //   prompt: "Explain how AI works in simple words",
+  //   systemInstruction: buildPatientAnalysisPrompt(result.data[0]),
+  // });
+
+  // console.log("AI Analysis:", test);
+
 
   sendResponse(res, StatusCodes.OK, {
     success: true,

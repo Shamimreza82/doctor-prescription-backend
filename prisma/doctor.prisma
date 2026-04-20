@@ -38,6 +38,7 @@ model Doctor {
   schedules       DoctorSchedule[]
   leaves          DoctorLeave[]
   feeConfigs      DoctorFeeConfig[]
+  prescriptions   Prescription[]
 
   @@unique([employeeId])
   @@unique([registrationNumber])
