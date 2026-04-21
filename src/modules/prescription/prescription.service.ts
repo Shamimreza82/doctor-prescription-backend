@@ -1,10 +1,16 @@
+import { mkdir, writeFile, access } from 'fs/promises';
+import path from 'path/win32';
+
 import { Prisma, PrescriptionStatus } from '@prisma/client';
 import { StatusCodes } from 'http-status-codes';
 
+import { prisma } from '@/bootstrap/prisma';
 import { AppError } from '@/shared/errors/AppError';
+import { PdfService } from '@/shared/lib/pdf.service';
 import { paginateResponse } from '@/shared/utils/paginateResponse';
 import { calculatePagination } from '@/shared/utils/pagination';
 
+import { PrescriptionPdfTemplate } from './prescription-pdf.template';
 import { PRESCRIPTION_MESSAGES } from './prescription.constants';
 import { PrescriptionRepository } from './prescription.repository';
 import { PrescriptionUtils } from './prescription.utlis';
@@ -13,6 +19,7 @@ import type {
   TPrescriptionActor,
   TPrescriptionCreateInput,
   TPrescriptionListQuery,
+  TPrescriptionPrintData,
   TPrescriptionUpdateInput,
 } from './prescription.types';
 
@@ -31,7 +38,7 @@ const createPrescription = async (actor: TPrescriptionActor, payload: TPrescript
 
   console.log('Resolved tenant scope:', scope);
 
-  
+
 
   await PrescriptionUtils.getPatientOrThrow(payload.patientId, scope);
   const doctorId = await PrescriptionUtils.getDoctorIdOrThrow(actor, scope, payload.doctorId);
@@ -59,12 +66,12 @@ const createPrescription = async (actor: TPrescriptionActor, payload: TPrescript
       },
       ...(payload.visitId
         ? {
-            visit: {
-              connect: {
-                id: payload.visitId,
-              },
+          visit: {
+            connect: {
+              id: payload.visitId,
             },
-          }
+          },
+        }
         : {}),
       prescriptionNumber: payload.prescriptionNumber ?? PrescriptionUtils.buildPrescriptionNumber(),
       status: payload.status ?? PrescriptionStatus.DRAFT,
@@ -133,13 +140,13 @@ const updatePrescription = async (
   if (payload.visitId !== undefined) {
     data.visit = payload.visitId
       ? {
-          connect: {
-            id: payload.visitId,
-          },
-        }
+        connect: {
+          id: payload.visitId,
+        },
+      }
       : {
-          disconnect: true,
-        };
+        disconnect: true,
+      };
   }
 
   if (payload.prescriptionNumber !== undefined) {
@@ -199,10 +206,148 @@ const archivePrescription = async (actor: TPrescriptionActor, prescriptionId: st
   });
 };
 
+const getFinalPrescriptionData = async (
+  prescriptionId: string
+): Promise<TPrescriptionPrintData> => {
+
+
+  if (!prescriptionId) {
+    throw new AppError(400, 'Prescription ID is required');
+  }
+  const prescription = await PrescriptionRepository.getPrescriptionById(prescriptionId);
+
+  if (!prescription) {
+    throw new AppError(StatusCodes.NOT_FOUND, 'Prescription not found');
+  } 
+
+  console.log('Fetched prescription data:', prescription);
+
+{
+
+  return {
+    id: prescription.id,
+    prescriptionNo: prescription.prescriptionNumber,
+    tenantId: prescription.tenantId,
+    issuedAt: prescription.issuedAt ? prescription.issuedAt.toISOString() : '',
+    patient: {
+      name: `${prescription.patient.firstName} ${prescription.patient.lastName ?? ''}`.trim(),
+      age: 32,
+      gender: 'Not specified',
+      phone: prescription.patient.phone ?? 'Not specified',
+    },
+    doctor: {
+      name: prescription.doctor.user.name,
+      designation: 'General Physician',
+      registrationNo: prescription.doctor.registrationNumber ?? 'Not specified',
+    },
+    diagnosis: prescription.diagnosis ?? 'Not specified',
+    medicines: prescription.items.map((item) => ({
+      name: item.medicineName,
+      strength: item.dosage ?? 'Not specified',
+      dosage: item.dosage ?? 'Not specified',
+      duration: `${item.durationValue ?? 'N/A'} ${item.durationUnit ?? ''}`.trim(),
+      instructions: item.instruction ?? 'No specific instructions',
+    })),
+    advice: prescription.advice ? [prescription.advice] : [],
+    followUpDate: prescription.followUpDate ? prescription.followUpDate.toISOString() : undefined,
+  };
+};
+}
+
+
+const generatePdf = async (actor: TPrescriptionActor, prescriptionId: string) => {
+  const data = await getFinalPrescriptionData(prescriptionId);
+
+  const html = PrescriptionPdfTemplate.generateHtml(data);
+  const pdfBuffer = await PdfService.generateFromHtml(html);
+
+  // use real tenant id from your data/auth context
+  const tenantId = data.tenantId ?? 't-001';
+
+  // dynamic file name
+  const fileName = `rx-${data.prescriptionNo}.pdf`;
+
+  // storage key -> save in DB if needed
+  const storageKey = path.join(
+    'tenants',
+    tenantId,
+    'prescriptions',
+    fileName
+  );
+
+  // absolute path -> for writing file
+  const absolutePath = path.join(process.cwd(), 'uploads', storageKey);
+
+  // relative path -> for API response
+  const relativePath = `/uploads/${storageKey.split(path.sep).join('/')}`;
+
+  // ensure folder exists
+  await mkdir(path.dirname(absolutePath), { recursive: true });
+
+  // write file
+  await writeFile(absolutePath, pdfBuffer);
+
+  await prisma.file.create({
+    data: {
+      tenantId: actor.tenantId,
+      uploadedById: actor.userId,
+      originalName: fileName,
+      mimeType: 'application/pdf',
+      sizeBytes: pdfBuffer.length,
+      storageKey,
+      entityType: 'PRESCRIPTION',
+      entityId: prescriptionId,
+      category: 'PRESCRIPTION',
+      title: `Prescription PDF - ${data.prescriptionNo}`,
+      notes: 'System generated prescription PDF',
+    },
+  });
+
+
+
+  return {
+    prescriptionId,
+    fileName,
+    filePath: relativePath,
+    sizeBytes: pdfBuffer.length,
+    downloadUrl: `/api/v1/prescriptions/${prescriptionId}/pdf/download`,
+    previewUrl: `/api/v1/prescriptions/${prescriptionId}/pdf/view`,
+    generatedAt: new Date().toISOString(),
+  };
+};
+
+
+const getPdfFilePath = async (prescriptionId: string) => {
+  const data = await getFinalPrescriptionData(prescriptionId);
+  const fileName = `rx-${data.prescriptionNo}.pdf`;
+  const filePath = path.join(
+    process.cwd(),
+    'uploads',
+    'prescriptions',
+    fileName
+  );
+
+  try {
+    await access(filePath);
+  } catch {
+    throw new AppError(StatusCodes.NOT_FOUND, 'PDF file not found. Please generate the PDF first.');
+  }
+
+  return {
+    fileName,
+    filePath,
+  };
+};
+
+
+
 export const PrescriptionServices = {
   createPrescription,
   listPrescriptions,
   getPrescriptionById,
   updatePrescription,
   archivePrescription,
+  getFinalPrescriptionData,
+  generatePdf,
+  getPdfFilePath,
 };

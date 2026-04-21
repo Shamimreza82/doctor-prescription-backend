@@ -24,7 +24,11 @@ const createPatient = async (data: Prisma.PatientCreateInput) => {
 const findFirstPatient = async (where: Prisma.PatientWhereInput) => {
   return prisma.patient.findFirst({
     where,
-    include: patientInclude,
+    include: {
+      ...patientInclude,
+      addresses: true,
+      prescriptions: true
+    }
   });
 };
 

@@ -73,3 +73,38 @@ export interface TPrescriptionListQuery extends TQueryOptions {
   issuedFrom?: Date;
   issuedTo?: Date;
 }
+
+
+
+
+
+export interface TPrescriptionPrintData {
+  id: string;
+  prescriptionNo: string;
+  tenantId: string;
+  issuedAt: string;
+  patient: {
+    name: string;
+    age: number;
+    gender: string;
+    phone?: string;
+  };
+  doctor: {
+    name: string;
+    designation?: string;
+    registrationNo?: string;
+  };
+  diagnosis?: string;
+  medicines: {
+    name: string;
+    strength?: string;
+    dosage: string;
+    duration: string;
+    instructions?: string;
+  }[];
+  advice?: string[];
+  followUpDate?: string;
+}
+
+
+

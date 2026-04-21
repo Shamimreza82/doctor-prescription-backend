@@ -1,10 +1,5 @@
 model File {
   id       String @id @default(uuid())
-  tenantId String @map("tenant_id")
-
-  uploadedById String? @map("uploaded_by_id")
-  uploadedBy   User?   @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
-
   originalName String @map("original_name")
   mimeType     String @map("mime_type")
   sizeBytes    Int    @map("size_bytes")
@@ -20,7 +15,15 @@ model File {
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+
+  tenantId String @map("tenant_id")
   tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  
+  uploadedById String? @map("uploaded_by_id")
+  uploadedBy   User?   @relation(fields: [uploadedById], references: [id], onDelete: Cascade)
+
+  patientId String  @map("patient_id")
+  patient   Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
 
   @@index([tenantId, entityType, entityId])
   @@index([uploadedById])

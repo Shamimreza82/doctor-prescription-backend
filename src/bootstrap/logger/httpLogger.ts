@@ -1,9 +1,10 @@
 import crypto from 'node:crypto';
 
-import type { Request, Response } from 'express';
 import { pinoHttp } from 'pino-http';
 
 import { requestPino } from './requestLogger';
+
+import type { Request, Response } from 'express';
 
 export const httpLogger = pinoHttp<Request, Response>({
   logger: requestPino,

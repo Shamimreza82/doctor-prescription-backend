@@ -48,6 +48,13 @@ const findFirstPrescription = async (where: Prisma.PrescriptionWhereInput) => {
   });
 };
 
+const getPrescriptionById = async (id: string) => {
+  return prisma.prescription.findUnique({
+    where: { id },
+    include: prescriptionInclude,
+  });
+};
+
 const listPrescriptions = async (
   where: Prisma.PrescriptionWhereInput,
   orderBy: Prisma.PrescriptionOrderByWithRelationInput[],
@@ -175,4 +182,5 @@ export const PrescriptionRepository = {
   findDoctorById,
   findDoctorByUserId,
   findVisitById,
+  getPrescriptionById
 };

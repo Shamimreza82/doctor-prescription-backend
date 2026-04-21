@@ -11,7 +11,7 @@ model Tenant {
   address String?
 
   ownerUserId String? @map("owner_user_id")
-  ownerUser   User?   @relation("TenantOwner", fields: [ownerUserId], references: [id], onDelete: SetNull)
+  ownerUser   User?   @relation("TenantOwner", fields: [ownerUserId], references: [id], onDelete: Cascade)
 
   isTrial       Boolean   @default(true) @map("is_trial")
   trialStartsAt DateTime? @map("trial_starts_at")

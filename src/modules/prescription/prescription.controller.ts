@@ -75,10 +75,55 @@ const archivePrescription = catchAsync(async (req, res) => {
   });
 });
 
+
+
+const generatePdfPrescription = catchAsync(async (req, res) => {
+  const { id: prescriptionId } = req.params as { id: string } ;
+  const user = req.user;
+
+  const result = await PrescriptionServices.generatePdf(user, prescriptionId);
+
+  sendResponse(res, 200, {
+    success: true,
+    message: 'Prescription PDF generated successfully',
+    data: result,
+  });
+});
+
+
+const downloadPdfPrescription = catchAsync(async (req, res) => {
+    const { id: prescriptionId } = req.params as { id: string } ;
+
+  const file = await PrescriptionServices.getPdfFilePath(prescriptionId);
+
+  res.download(file.filePath, file.fileName);
+});
+
+
+
+const viewPdfPrescription = catchAsync(async (req, res) => {
+   const { id: prescriptionId } = req.params as { id: string } ;
+
+  const file = await PrescriptionServices.getPdfFilePath(prescriptionId);
+
+  console.log(file)
+
+  res.setHeader('Content-Type', 'application/pdf');
+  res.setHeader('Content-Disposition', `inline; filename="${file.fileName}"`);
+
+  res.sendFile(file.filePath);
+});
+
+
+
+
 export const PrescriptionControllers = {
   createPrescription,
   listPrescriptions,
   getPrescriptionById,
   updatePrescription,
   archivePrescription,
+  generatePdfPrescription,
+  downloadPdfPrescription,
+  viewPdfPrescription,
 };

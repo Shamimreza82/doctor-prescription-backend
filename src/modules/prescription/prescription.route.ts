@@ -42,4 +42,20 @@ router.delete(
   PrescriptionControllers.archivePrescription,
 );
 
+////// pdf routes ////////
+router.post(
+  '/:id/generate-pdf',
+  PrescriptionControllers.generatePdfPrescription,
+);
+
+router.get(
+  '/:id/download-pdf',
+  PrescriptionControllers.downloadPdfPrescription,
+);
+
+router.get(
+  '/:id/view-pdf',
+  PrescriptionControllers.viewPdfPrescription,
+);
+
 export const prescriptionRoutes = router;
