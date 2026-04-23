@@ -22,8 +22,8 @@ model File {
   uploadedById String? @map("uploaded_by_id")
   uploadedBy   User?   @relation(fields: [uploadedById], references: [id], onDelete: Cascade)
 
-  patientId String  @map("patient_id")
-  patient   Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  patientId String?  @map("patient_id")
+  patient   Patient? @relation(fields: [patientId], references: [id], onDelete: Cascade)
 
   @@index([tenantId, entityType, entityId])
   @@index([uploadedById])

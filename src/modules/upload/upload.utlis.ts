@@ -7,7 +7,7 @@ import { StatusCodes } from 'http-status-codes';
 
 import { AppError } from '@/shared/errors/AppError';
 
-import { FILE_MESSAGES, UPLOAD_DIR } from './upload.constand';
+import { FILE_ENTITY_TYPES, FILE_MESSAGES, UPLOAD_DIR } from './upload.constand';
 import { UploadRepository } from './upload.repository';
 
 import type { TFileEntityType, TListFilesQuery, TUploadActor, TUploadScope } from './upload.types';
@@ -114,23 +114,32 @@ const getScopedFileOrThrow = async (fileId: string, scope: TUploadScope) => {
   return file;
 };
 
+
+
+
 const assertEntityBelongsToTenant = async (
   entityType: TFileEntityType,
   entityId: string,
   tenantId: string,
 ) => {
-  const countByEntityType = {
-    PATIENT: () => UploadRepository.countPatient(entityId, tenantId),
-    DOCTOR: () => UploadRepository.countDoctor(entityId, tenantId),
-    PRESCRIPTION: () => UploadRepository.countPrescription(entityId, tenantId),
-  } satisfies Record<TFileEntityType, () => Promise<number>>;
+  let count = 0;
 
-  const count = await countByEntityType[entityType]();
+  if (entityType === FILE_ENTITY_TYPES[0]) {
+    count = await UploadRepository.countPatient(entityId, tenantId);
+  } else if (entityType === FILE_ENTITY_TYPES[1]) {
+    count = await UploadRepository.countDoctor(entityId, tenantId);
+  } else if (entityType === FILE_ENTITY_TYPES[2]) {
+    count = await UploadRepository.countPrescription(entityId, tenantId);
+  }
 
   if (!count) {
     throw new AppError(StatusCodes.NOT_FOUND, FILE_MESSAGES.ENTITY_NOT_FOUND);
   }
 };
+
+
+
+
 
 const getUploadDirectory = () => path.resolve(process.cwd(), UPLOAD_DIR);
 

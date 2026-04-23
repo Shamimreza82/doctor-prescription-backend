@@ -38,18 +38,23 @@ const uploadFile = async (
   payload: TCreateFileInput,
   file?: TUploadedFile,
 ) => {
+
+
+  const { entityType, entityId } = {...payload}
+
   if (!file) {
     throw new AppError(StatusCodes.BAD_REQUEST, FILE_MESSAGES.FILE_REQUIRED);
   }
 
   try {
-    const scope = UploadUtils.resolveTenantScope(actor, payload.tenantId);
+    const scope = UploadUtils.resolveTenantScope(actor, actor.tenantId);
+
 
     if (!scope.tenantId) {
       throw new AppError(StatusCodes.BAD_REQUEST, FILE_MESSAGES.TENANT_REQUIRED);
     }
 
-    await UploadUtils.assertEntityBelongsToTenant(payload.entityType, payload.entityId, scope.tenantId);
+    await UploadUtils.assertEntityBelongsToTenant(entityType, entityId, scope.tenantId);
 
     return UploadRepository.createFile({
       tenant: {
@@ -66,8 +71,11 @@ const uploadFile = async (
       mimeType: file.mimetype,
       sizeBytes: file.size,
       storageKey: file.path,
-      entityType: payload.entityType,
-      entityId: payload.entityId
+      entityType: entityType,
+      entityId: entityId,
+      category: payload.category,
+      title: payload.title,
+      notes: payload.notes,
     });
   } catch (error) {
     await unlinkFile(file.path);

@@ -6,6 +6,7 @@ export const FILE_CATEGORIES = [
   'PROFILE_IMAGE',
   'NID',
   'INVOICE',
+  "SIGNATURE",
   'OTHER',
 ] as const;
 

@@ -15,7 +15,7 @@ const resolveTenantScope = (
 
   if (isSuperAdmin) {
     return {
-      tenantId: requestedTenantId,
+      tenantId: actor.tenantId ?? requestedTenantId,
       isSuperAdmin: true,
     };
   }
@@ -78,6 +78,8 @@ const getPatientOrThrow = async (patientId: string, scope: TPrescriptionScope) =
   return patient;
 };
 
+
+
 const getDoctorIdOrThrow = async (
   actor: TPrescriptionActor,
   scope: TPrescriptionScope,
@@ -113,6 +115,10 @@ const getDoctorIdOrThrow = async (
 
   return doctor.id;
 };
+
+
+
+
 
 const validateVisitOrThrow = async (
   visitId: string,

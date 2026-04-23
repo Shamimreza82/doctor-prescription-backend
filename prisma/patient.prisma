@@ -9,8 +9,8 @@ model Patient {
   patientCode String
   firstName   String  @map("first_name")
   lastName    String? @map("last_name")
-  phone       String?
-  email       String?
+  phone       String  @unique
+  email       String?  
 
   gender      Gender?
   dateOfBirth DateTime? @map("date_of_birth")

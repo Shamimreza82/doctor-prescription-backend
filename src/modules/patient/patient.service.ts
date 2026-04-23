@@ -26,7 +26,7 @@ import type {
 
 
 const createPatient = async (actor: TPatientActor, payload: TPatientCreateInput) => {
-  const scope = PatientUtils.resolveTenantScope(actor, payload.tenantId);
+  const scope = PatientUtils.resolveTenantScope(actor);
 
   if (!scope.tenantId) {
     throw new AppError(StatusCodes.BAD_REQUEST, PATIENT_MESSAGES.TENANT_REQUIRED);

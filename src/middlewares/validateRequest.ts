@@ -5,6 +5,7 @@ import type { ZodTypeAny } from 'zod';
 
 export const validateRequest = (schema: ZodTypeAny): RequestHandler =>
   catchAsync(async (req, _res, next) => {
+
     await schema.parseAsync({
       body: req.body as unknown,
       query: { ...req.query } as unknown,

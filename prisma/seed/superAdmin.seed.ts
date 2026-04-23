@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 import { logger } from "@/bootstrap/logger";
 import { prisma } from "@/bootstrap/prisma";
 
+
 export const seedSuperAdmin = async () => {
   const email = "admin@system.com";
 

@@ -30,13 +30,12 @@ import type {
 
 const createPrescription = async (actor: TPrescriptionActor, payload: TPrescriptionCreateInput) => {
 
-  const scope = PrescriptionUtils.resolveTenantScope(actor, payload.tenantId);
+
+  const scope = PrescriptionUtils.resolveTenantScope(actor);
 
   if (!scope.tenantId) {
     throw new AppError(StatusCodes.BAD_REQUEST, PRESCRIPTION_MESSAGES.TENANT_REQUIRED);
   }
-
-  console.log('Resolved tenant scope:', scope);
 
 
 

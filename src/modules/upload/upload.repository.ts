@@ -73,9 +73,11 @@ const countPatient = async (patientId: string, tenantId: string) => {
 };
 
 const countDoctor = async (doctorId: string, tenantId: string) => {
+
+  console.log('counting doctor with id', doctorId, 'and tenantId', tenantId);
   return prisma.doctor.count({
     where: {
-      id: doctorId,
+      userId: doctorId,
       tenantId,
     },
   });

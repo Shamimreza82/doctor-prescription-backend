@@ -35,6 +35,9 @@ CREATE TYPE "VisitPriority" AS ENUM ('LOW', 'NORMAL', 'HIGH', 'URGENT', 'CRITICA
 CREATE TYPE "VisitSource" AS ENUM ('DIRECT', 'APPOINTMENT', 'EMERGENCY', 'REFERRAL', 'WALK_IN');
 
 -- CreateEnum
+CREATE TYPE "PrescriptionStatus" AS ENUM ('DRAFT', 'ISSUED', 'CANCELLED', 'COMPLETED');
+
+-- CreateEnum
 CREATE TYPE "SubscriptionStatus" AS ENUM ('TRIALING', 'ACTIVE', 'PAST_DUE', 'CANCELED', 'EXPIRED');
 
 -- CreateEnum
@@ -259,24 +262,20 @@ CREATE TABLE "doctor_fee_configs" (
 -- CreateTable
 CREATE TABLE "files" (
     "id" TEXT NOT NULL,
-    "tenant_id" TEXT NOT NULL,
-    "uploaded_by_id" TEXT,
-    "file_name" TEXT NOT NULL,
     "original_name" TEXT NOT NULL,
     "mime_type" TEXT NOT NULL,
-    "extension" TEXT NOT NULL,
     "size_bytes" INTEGER NOT NULL,
-    "storage_provider" TEXT NOT NULL,
     "storage_key" TEXT NOT NULL,
-    "bucket" TEXT,
-    "url" TEXT,
-    "entity_type" TEXT,
-    "entity_id" TEXT,
-    "is_public" BOOLEAN NOT NULL DEFAULT false,
-    "checksum" TEXT,
+    "entity_type" TEXT NOT NULL,
+    "entity_id" TEXT NOT NULL,
+    "category" TEXT,
+    "title" TEXT,
+    "notes" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
-    "deleted_at" TIMESTAMP(3),
+    "tenant_id" TEXT NOT NULL,
+    "uploaded_by_id" TEXT,
+    "patient_id" TEXT,
 
     CONSTRAINT "files_pkey" PRIMARY KEY ("id")
 );
@@ -289,7 +288,7 @@ CREATE TABLE "patients" (
     "patientCode" TEXT NOT NULL,
     "first_name" TEXT NOT NULL,
     "last_name" TEXT,
-    "phone" TEXT,
+    "phone" TEXT NOT NULL,
     "email" TEXT,
     "gender" "Gender",
     "date_of_birth" TIMESTAMP(3),
@@ -432,6 +431,52 @@ CREATE TABLE "visits" (
 );
 
 -- CreateTable
+CREATE TABLE "prescriptions" (
+    "id" TEXT NOT NULL,
+    "tenant_id" TEXT NOT NULL,
+    "patient_id" TEXT NOT NULL,
+    "doctor_id" TEXT NOT NULL,
+    "visit_id" TEXT,
+    "prescription_number" TEXT NOT NULL,
+    "status" "PrescriptionStatus" NOT NULL DEFAULT 'DRAFT',
+    "diagnosis" TEXT,
+    "symptoms" TEXT,
+    "advice" TEXT,
+    "notes" TEXT,
+    "follow_up_date" TIMESTAMP(3),
+    "issued_at" TIMESTAMP(3),
+    "expires_at" TIMESTAMP(3),
+    "metadata" JSONB,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+    "deleted_at" TIMESTAMP(3),
+
+    CONSTRAINT "prescriptions_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "prescription_items" (
+    "id" TEXT NOT NULL,
+    "prescription_id" TEXT NOT NULL,
+    "medicine_name" TEXT NOT NULL,
+    "generic_name" TEXT,
+    "dosage" TEXT,
+    "frequency" TEXT,
+    "duration_value" INTEGER,
+    "duration_unit" TEXT,
+    "route" TEXT,
+    "instruction" TEXT,
+    "quantity" TEXT,
+    "timing" TEXT,
+    "sort_order" INTEGER NOT NULL DEFAULT 0,
+    "metadata" JSONB,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "prescription_items_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "plans" (
     "id" TEXT NOT NULL,
     "code" TEXT NOT NULL,
@@ -476,7 +521,7 @@ CREATE TABLE "tenants" (
     "status" "TenantStatus" NOT NULL DEFAULT 'PENDING',
     "email" TEXT,
     "phone" TEXT,
-    "logoUrl" TEXT,
+    "logo_url" TEXT,
     "address" TEXT,
     "owner_user_id" TEXT,
     "is_trial" BOOLEAN NOT NULL DEFAULT true,
@@ -631,13 +676,16 @@ CREATE INDEX "doctor_leaves_start_date_end_date_idx" ON "doctor_leaves"("start_d
 CREATE INDEX "doctor_fee_configs_doctor_id_idx" ON "doctor_fee_configs"("doctor_id");
 
 -- CreateIndex
-CREATE INDEX "files_tenant_id_idx" ON "files"("tenant_id");
+CREATE INDEX "files_tenant_id_entity_type_entity_id_idx" ON "files"("tenant_id", "entity_type", "entity_id");
 
 -- CreateIndex
-CREATE INDEX "files_entity_type_entity_id_idx" ON "files"("entity_type", "entity_id");
+CREATE INDEX "files_uploaded_by_id_idx" ON "files"("uploaded_by_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "patients_user_id_key" ON "patients"("user_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "patients_phone_key" ON "patients"("phone");
 
 -- CreateIndex
 CREATE INDEX "patients_tenant_id_idx" ON "patients"("tenant_id");
@@ -670,6 +718,27 @@ CREATE UNIQUE INDEX "patient_identifiers_patient_id_type_value_key" ON "patient_
 CREATE UNIQUE INDEX "visits_visit_number_key" ON "visits"("visit_number");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "prescriptions_prescription_number_key" ON "prescriptions"("prescription_number");
+
+-- CreateIndex
+CREATE INDEX "prescriptions_tenant_id_idx" ON "prescriptions"("tenant_id");
+
+-- CreateIndex
+CREATE INDEX "prescriptions_patient_id_idx" ON "prescriptions"("patient_id");
+
+-- CreateIndex
+CREATE INDEX "prescriptions_doctor_id_idx" ON "prescriptions"("doctor_id");
+
+-- CreateIndex
+CREATE INDEX "prescriptions_visit_id_idx" ON "prescriptions"("visit_id");
+
+-- CreateIndex
+CREATE INDEX "prescriptions_tenant_id_status_idx" ON "prescriptions"("tenant_id", "status");
+
+-- CreateIndex
+CREATE INDEX "prescription_items_prescription_id_idx" ON "prescription_items"("prescription_id");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "plans_code_key" ON "plans"("code");
 
 -- CreateIndex
@@ -686,6 +755,24 @@ CREATE UNIQUE INDEX "tenants_slug_key" ON "tenants"("slug");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "tenants_code_key" ON "tenants"("code");
+
+-- CreateIndex
+CREATE INDEX "tenants_status_idx" ON "tenants"("status");
+
+-- CreateIndex
+CREATE INDEX "tenants_email_idx" ON "tenants"("email");
+
+-- CreateIndex
+CREATE INDEX "tenants_phone_idx" ON "tenants"("phone");
+
+-- CreateIndex
+CREATE INDEX "tenants_is_trial_idx" ON "tenants"("is_trial");
+
+-- CreateIndex
+CREATE INDEX "tenants_trial_ends_at_idx" ON "tenants"("trial_ends_at");
+
+-- CreateIndex
+CREATE INDEX "tenants_deleted_at_idx" ON "tenants"("deleted_at");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "tenant_settings_tenant_id_key" ON "tenant_settings"("tenant_id");
@@ -754,10 +841,13 @@ ALTER TABLE "doctor_fee_configs" ADD CONSTRAINT "doctor_fee_configs_doctor_id_fk
 ALTER TABLE "doctor_fee_configs" ADD CONSTRAINT "doctor_fee_configs_chamber_id_fkey" FOREIGN KEY ("chamber_id") REFERENCES "doctor_chambers"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "files" ADD CONSTRAINT "files_tenant_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "tenants"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "files" ADD CONSTRAINT "files_tenant_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "tenants"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "files" ADD CONSTRAINT "files_uploaded_by_id_fkey" FOREIGN KEY ("uploaded_by_id") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "files" ADD CONSTRAINT "files_uploaded_by_id_fkey" FOREIGN KEY ("uploaded_by_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "files" ADD CONSTRAINT "files_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "patients"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "patients" ADD CONSTRAINT "patients_tenant_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "tenants"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -785,6 +875,21 @@ ALTER TABLE "visits" ADD CONSTRAINT "visits_patient_id_fkey" FOREIGN KEY ("patie
 
 -- AddForeignKey
 ALTER TABLE "visits" ADD CONSTRAINT "visits_doctor_id_fkey" FOREIGN KEY ("doctor_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "prescriptions" ADD CONSTRAINT "prescriptions_tenant_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "tenants"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "prescriptions" ADD CONSTRAINT "prescriptions_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "patients"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "prescriptions" ADD CONSTRAINT "prescriptions_doctor_id_fkey" FOREIGN KEY ("doctor_id") REFERENCES "doctor_profiles"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "prescriptions" ADD CONSTRAINT "prescriptions_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "visits"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "prescription_items" ADD CONSTRAINT "prescription_items_prescription_id_fkey" FOREIGN KEY ("prescription_id") REFERENCES "prescriptions"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "tenant_subscriptions" ADD CONSTRAINT "tenant_subscriptions_tenant_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "tenants"("id") ON DELETE CASCADE ON UPDATE CASCADE;

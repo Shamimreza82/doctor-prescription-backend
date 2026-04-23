@@ -7,11 +7,11 @@ model Tenant {
 
   email   String?
   phone   String?
-  logoUrl String?
+  logoUrl String?     @map("logo_url")
   address String?
 
   ownerUserId String? @map("owner_user_id")
-  ownerUser   User?   @relation("TenantOwner", fields: [ownerUserId], references: [id], onDelete: Cascade)
+  ownerUser   User?   @relation("TenantOwner", fields: [ownerUserId], references: [id], onDelete: SetNull)
 
   isTrial       Boolean   @default(true) @map("is_trial")
   trialStartsAt DateTime? @map("trial_starts_at")
@@ -29,14 +29,20 @@ model Tenant {
   subscriptions Subscription[]
   settings      TenantSetting?
   users         User[]
+  activityLogs  ActivityLog[]
+  auditLogs     AuditLog[]
+  doctors       Doctor[]
+  files         File[]
 
-  createdAt    DateTime      @default(now()) @map("created_at")
-  updatedAt    DateTime      @updatedAt @map("updated_at")
-  activityLogs ActivityLog[]
-  auditLogs    AuditLog[]
-  doctors      Doctor[]
-  files        File[]
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
+  @@index([status])
+  @@index([email])
+  @@index([phone])
+  @@index([isTrial])
+  @@index([trialEndsAt])
+  @@index([deletedAt])
   @@map("tenants")
 }
 
