@@ -114,9 +114,6 @@ const getScopedFileOrThrow = async (fileId: string, scope: TUploadScope) => {
   return file;
 };
 
-
-
-
 const assertEntityBelongsToTenant = async (
   entityType: TFileEntityType,
   entityId: string,
@@ -136,10 +133,6 @@ const assertEntityBelongsToTenant = async (
     throw new AppError(StatusCodes.NOT_FOUND, FILE_MESSAGES.ENTITY_NOT_FOUND);
   }
 };
-
-
-
-
 
 const getUploadDirectory = () => path.resolve(process.cwd(), UPLOAD_DIR);
 

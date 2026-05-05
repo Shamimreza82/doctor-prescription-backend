@@ -12,7 +12,7 @@ const router = express.Router()
 
 router.post(
   '/doctors',
-  auth(Role.SUPER_ADMIN),
+  auth(Role.SUPER_ADMIN, Role.MR),
   validateRequest(OnboardingValidationSchemas.onboardingRegisterSchema),
   OnboardingControllers.createDoctor,
 );

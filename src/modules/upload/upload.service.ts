@@ -32,7 +32,6 @@ const unlinkFile = async (storageKey: string) => {
   }
 };
 
-
 const uploadFile = async (
   actor: TUploadActor,
   payload: TCreateFileInput,
@@ -88,6 +87,8 @@ const listFiles = async (actor: TUploadActor, query: TListFilesQuery) => {
   const { page, limit, skip } = calculatePagination(query);
   const where = UploadUtils.buildFileListWhere(scope, query);
   const orderBy = UploadUtils.buildOrderBy(query.sortBy, query.sortOrder);
+
+  
   const { data, total } = await UploadRepository.listFiles(where, orderBy, skip, limit);
 
   return paginateResponse(data, total, page, limit);

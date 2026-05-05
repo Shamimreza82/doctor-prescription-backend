@@ -12,6 +12,8 @@ import type {
   TUpdateFileValidationInput,
 } from './upload.validation';
 
+
+
 const uploadFile = catchAsync(async (req, res) => {
 
   
@@ -58,8 +60,6 @@ const updateFile = catchAsync(async (req, res) => {
     req.params['id'] as string,
     req.body as TUpdateFileValidationInput,
   );
-
-  
 
   sendResponse(res, StatusCodes.OK, {
     success: true,

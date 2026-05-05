@@ -32,13 +32,6 @@ const listPatients = catchAsync(async (req, res) => {
     req.query as unknown as TListPatientsValidationInput,
   );
 
-  // const test = await generateText("gemini", {
-  //   prompt: "Explain how AI works in simple words",
-  //   systemInstruction: buildPatientAnalysisPrompt(result.data[0]),
-  // });
-
-  // console.log("AI Analysis:", test);
-
 
   sendResponse(res, StatusCodes.OK, {
     success: true,

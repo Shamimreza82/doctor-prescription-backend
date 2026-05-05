@@ -1,5 +1,7 @@
+
+
 model File {
-  id       String @id @default(uuid())
+  id           String @id @default(uuid())
   originalName String @map("original_name")
   mimeType     String @map("mime_type")
   sizeBytes    Int    @map("size_bytes")
@@ -17,8 +19,8 @@ model File {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   tenantId String @map("tenant_id")
-  tenant    Tenant   @relation(fields: [tenantId], references: [id])
-  
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+
   uploadedById String? @map("uploaded_by_id")
   uploadedBy   User?   @relation(fields: [uploadedById], references: [id], onDelete: Cascade)
 

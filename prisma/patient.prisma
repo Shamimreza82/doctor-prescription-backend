@@ -10,7 +10,7 @@ model Patient {
   firstName   String  @map("first_name")
   lastName    String? @map("last_name")
   phone       String  @unique
-  email       String?  
+  email       String?
 
   gender      Gender?
   dateOfBirth DateTime? @map("date_of_birth")
@@ -30,7 +30,7 @@ model Patient {
 
   addresses         PatientAddress[]
   emergencyContacts PatientEmergencyContact[]
-  medicalProfile    PatientMedicalProfile?   ///// this is most importen for doctor to see the patient history and condition
+  medicalProfile    PatientMedicalProfile? ///// this is most importen for doctor to see the patient history and condition
   insurances        PatientInsurance[]
   identifiers       PatientIdentifier[]
   prescriptions     Prescription[]
@@ -165,7 +165,6 @@ enum PatientIdentifierType {
   HOSPITAL_CARD
   OTHER
 }
-
 
 model Visit {
   id String @id @default(uuid())

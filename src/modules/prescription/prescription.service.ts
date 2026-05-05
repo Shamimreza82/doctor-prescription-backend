@@ -253,15 +253,18 @@ const getFinalPrescriptionData = async (
 };
 }
 
-
 const generatePdf = async (actor: TPrescriptionActor, prescriptionId: string) => {
   const data = await getFinalPrescriptionData(prescriptionId);
+  const scope = PrescriptionUtils.resolveTenantScope(actor, data.tenantId);
+
+  if (!scope.tenantId) {
+    throw new AppError(StatusCodes.BAD_REQUEST, PRESCRIPTION_MESSAGES.TENANT_REQUIRED);
+  }
 
   const html = PrescriptionPdfTemplate.generateHtml(data);
   const pdfBuffer = await PdfService.generateFromHtml(html);
 
-  // use real tenant id from your data/auth context
-  const tenantId = data.tenantId ?? 't-001';
+  const tenantId = scope.tenantId;
 
   // dynamic file name
   const fileName = `rx-${data.prescriptionNo}.pdf`;
@@ -288,7 +291,7 @@ const generatePdf = async (actor: TPrescriptionActor, prescriptionId: string) =>
 
   await prisma.file.create({
     data: {
-      tenantId: actor.tenantId,
+      tenantId,
       uploadedById: actor.userId,
       originalName: fileName,
       mimeType: 'application/pdf',
@@ -314,7 +317,6 @@ const generatePdf = async (actor: TPrescriptionActor, prescriptionId: string) =>
     generatedAt: new Date().toISOString(),
   };
 };
-
 
 const getPdfFilePath = async (prescriptionId: string) => {
   const data = await getFinalPrescriptionData(prescriptionId);

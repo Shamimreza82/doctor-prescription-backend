@@ -15,6 +15,7 @@ import type {
 
 
 const createPrescription = catchAsync(async (req, res) => {
+
   const result = await PrescriptionServices.createPrescription(
     req.user,
     req.body as TPrescriptionCreateInput,
@@ -75,8 +76,6 @@ const archivePrescription = catchAsync(async (req, res) => {
   });
 });
 
-
-
 const generatePdfPrescription = catchAsync(async (req, res) => {
   const { id: prescriptionId } = req.params as { id: string } ;
   const user = req.user;
@@ -90,7 +89,6 @@ const generatePdfPrescription = catchAsync(async (req, res) => {
   });
 });
 
-
 const downloadPdfPrescription = catchAsync(async (req, res) => {
     const { id: prescriptionId } = req.params as { id: string } ;
 
@@ -98,8 +96,6 @@ const downloadPdfPrescription = catchAsync(async (req, res) => {
 
   res.download(file.filePath, file.fileName);
 });
-
-
 
 const viewPdfPrescription = catchAsync(async (req, res) => {
    const { id: prescriptionId } = req.params as { id: string } ;

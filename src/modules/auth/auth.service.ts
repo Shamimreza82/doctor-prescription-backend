@@ -75,9 +75,6 @@ const login = async (payload: TLoginInput) => {
   };
 };
 
-
-
-
 const refreshToken = async (token: string) => {
   const decoded = verifyRefreshToken(token) as TJwtPayload;
   const existingUser = await findUserById(decoded.userId);

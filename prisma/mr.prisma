@@ -1,0 +1,60 @@
+
+
+model MRProfile {
+  id String @id @default(uuid()) @map("id")
+
+  userId String @unique @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  tenantId String @map("tenant_id")
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  employeeId  String? @unique @map("employee_id")
+  designation String? @map("designation")
+
+  territory String? @map("territory")
+  region    String? @map("region")
+  zone      String? @map("zone")
+
+  companyName String? @map("company_name")
+
+  isActive Boolean @default(true) @map("is_active")
+
+  totalVisits Int       @default(0) @map("total_visits")
+  lastVisitAt DateTime? @map("last_visit_at")
+
+  // 🔥 MANY-TO-MANY RELATION
+  doctorAssignments MRDoctorAssignment[] @relation("mr_doctor_links")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("mr_profiles")
+}
+
+model MRDoctorAssignment {
+  id String @id @default(uuid()) @map("id")
+
+  mrId     String @map("mr_id")
+  doctorId String @map("doctor_id")
+
+  mr     MRProfile @relation("mr_doctor_links", fields: [mrId], references: [id], onDelete: Cascade)
+  doctor Doctor    @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+
+  assignedBy String? @map("assigned_by") // SUPER ADMIN tracking
+
+  assignedAt DateTime @default(now()) @map("assigned_at")
+
+  status AssignmentStatus @default(ACTIVE) @map("status")
+
+  @@unique([mrId, doctorId])
+  @@index([mrId])
+  @@index([doctorId])
+  @@map("mr_doctor_assignments")
+}
+
+enum AssignmentStatus {
+  ACTIVE
+  INACTIVE
+  REVOKED
+}

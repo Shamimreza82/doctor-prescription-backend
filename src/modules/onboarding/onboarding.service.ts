@@ -65,11 +65,13 @@ const createDoctor = async (payload: TOnboardingInput) => {
       }
     });
 
+    const regNumber = `REG-${Math.floor(100000 + Math.random() * 900000)}`;
+
     await tx.doctor.create({
       data: {
         tenantId: tenant.id,  
         userId: user.id,
-        registrationNumber: `REG-${Math.floor(100000 + Math.random() * 900000)}`,
+        registrationNumber: regNumber,
       }
     });
 
@@ -103,7 +105,6 @@ const createDoctor = async (payload: TOnboardingInput) => {
 
 
   });
-
   return true
 };
 

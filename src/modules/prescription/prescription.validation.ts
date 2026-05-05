@@ -20,7 +20,6 @@ const prescriptionItemSchema = z
 
 const prescriptionBodySchema = z
   .object({
-    patientId: z.uuid('Invalid patient ID'),
     doctorId: z.uuid('Invalid doctor ID').optional(),
     visitId: z.uuid('Invalid visit ID').nullable().optional(),
     prescriptionNumber: z.string().trim().min(1).optional(),
@@ -55,6 +54,7 @@ const prescriptionParamsSchema = z.object({
   }),
 });
 
+
 const listPrescriptionsSchema = z.object({
   query: z
     .object({
@@ -77,9 +77,10 @@ export const PrescriptionValidationSchemas = {
   createPrescriptionSchema,
   updatePrescriptionSchema,
   prescriptionParamsSchema,
-  listPrescriptionsSchema,
+  listPrescriptionsSchema
 };
 
 export type TCreatePrescriptionValidationInput = z.infer<typeof createPrescriptionSchema>['body'];
 export type TUpdatePrescriptionValidationInput = z.infer<typeof updatePrescriptionSchema>['body'];
 export type TListPrescriptionsValidationInput = z.infer<typeof listPrescriptionsSchema>['query'];
+
