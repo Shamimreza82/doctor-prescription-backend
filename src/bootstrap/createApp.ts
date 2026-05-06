@@ -1,3 +1,5 @@
+import path from 'path';
+
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
@@ -20,6 +22,7 @@ import { apiRouter } from '../routes';
 import type { RequestHandler } from 'express';
 
 import '@/workers';
+
 
 export const createApp = () => {
   const app = express();
@@ -45,7 +48,7 @@ export const createApp = () => {
       message: 'api work file',
     });
   });
-
+  app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
   app.use('/docs', swaggerUi.serve, swaggerUi.setup(openApiDocument));
   app.use('/api/v1', apiRouter);
   app.use(notFound);

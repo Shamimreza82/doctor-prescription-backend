@@ -12,12 +12,15 @@ const storage = multer.diskStorage({
   },
 });
 
+
+
 const upload = multer({
   storage,
   limits: {
     fileSize: MAX_FILE_SIZE_BYTES,
   },
 });
+
 
 export const MulterConfig = {
   upload,
@@ -26,3 +29,6 @@ export const MulterConfig = {
     fileSize: MAX_FILE_SIZE_BYTES,
   },
 };  
+
+
+

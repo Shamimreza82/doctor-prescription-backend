@@ -15,10 +15,15 @@ export interface TUploadScope {
 }
 
 export interface TUploadedFile {
+  fieldname: string;
+  filename: string;
+  encoding: string;
   originalname: string;
   mimetype: string;
   size: number;
   path: string;
+  destination: string;
+  buffer?: Buffer;
 }
 
 export interface TCreateFileInput {

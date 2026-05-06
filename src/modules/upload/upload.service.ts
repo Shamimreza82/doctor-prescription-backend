@@ -38,7 +38,9 @@ const uploadFile = async (
   file?: TUploadedFile,
 ) => {
 
+//   console.log(file)
 
+// return
   const { entityType, entityId } = {...payload}
 
   if (!file) {
@@ -69,7 +71,7 @@ const uploadFile = async (
       originalName: file.originalname,
       mimeType: file.mimetype,
       sizeBytes: file.size,
-      storageKey: file.path,
+      storageKey: `/uploads/${file.filename}`,
       entityType: entityType,
       entityId: entityId,
       category: payload.category,

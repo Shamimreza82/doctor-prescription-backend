@@ -5,11 +5,12 @@ import { onboardingRouter } from '@/modules/onboarding/onboarding.router';
 import { patientRoutes } from '@/modules/patient/patient.route';
 import { prescriptionRoutes } from '@/modules/prescription/prescription.route';
 import { uploadRouter } from '@/modules/upload/upload.router';
+import { userRouter } from '@/modules/user/user.router';
 
 export const apiRouter = Router();
 
 apiRouter.use('/auth', authRoutes);
-// apiRouter.use('/doctors', doctorRoutes);
+apiRouter.use('/user', userRouter);
 apiRouter.use('/onboarding', onboardingRouter);
 apiRouter.use('/patients', patientRoutes);
 apiRouter.use('/prescriptions', prescriptionRoutes);
