@@ -1,21 +1,23 @@
-import { logger } from '@/bootstrap/logger';
-
 import type { Request } from 'express';
-import type { Logger } from 'pino';
 
-type RequestWithLog = Request & { id?: string; log?: Logger; user?: { id: string; role: string } };
+type RequestWithLog = Request & { id?: string; log?: any; user?: { id: string; role: string } };
 
-export const getRequestLogger = (req: Request): Logger => {
+export const getRequestLogger = (req: Request): any => {
   const request = req as RequestWithLog;
 
   if (request.log) {
     return request.log;
   }
 
-  return logger.child({
-    requestId: request.id,
-    userId: request.user?.id,
-  });
+  // Fallback to console if no request logger is present
+  return {
+    child: () => console,
+    info: console.info,
+    error: console.error,
+    warn: console.warn,
+    debug: console.debug,
+    trace: console.trace,
+  };
 };
 
 export const getRequestId = (req: Request): string | undefined => {

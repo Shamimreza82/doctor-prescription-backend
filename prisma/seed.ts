@@ -1,4 +1,3 @@
-import { logger } from "@/bootstrap/logger";
 import { prisma } from "@/bootstrap/prisma";
 
 import { seedPlans } from './seed/plan.seed';
@@ -11,7 +10,7 @@ async function main() {
 
 main()
   .then(() => {
-   logger.info("🌱 Seeding completed");
+   console.info("🌱 Seeding completed");
   })
   .catch((e) => {
     console.error(e);

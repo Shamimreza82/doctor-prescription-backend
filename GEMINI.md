@@ -2,99 +2,78 @@
 
 ## Project Summary
 - Backend API for a doctor prescription platform.
-- Stack: Node.js 20+, Express 5, TypeScript, Prisma, PostgreSQL, Redis, BullMQ, Zod, Pino, Vitest.
+- Stack: Node.js 20+, Express 5, TypeScript 5.9, Prisma 7, PostgreSQL.
 - API routes are mounted under `/api/v1`.
+- API Documentation (OpenAPI/Swagger) is available at `/docs`.
 
 ## Current Active Modules
-- `auth`
-- `onboarding`
-- `patient`
+Mounted routes in [src/routes/index.ts](src/routes/index.ts):
+- `auth` -> `/auth`
+- `user` -> `/user`
+- `onboarding` -> `/onboarding`
+- `patients` -> `/patients`
+- `prescriptions` -> `/prescriptions`
+- `files` (upload) -> `/files`
 
-There is also source code for other modules, but the current public API surface is defined by [src/routes/index.ts](/home/reza/codeing/doctor-prescription/doctor-prescription-backend%20(Copy)/src/routes/index.ts).
+Other modules like `ai` and `doctor` exist but may not be fully mounted yet.
 
 ## Common Commands
 ```bash
-npm run dev
-npm run build
-npm run typecheck
-npm run lint
-npm run test
-npm run prisma:generate
-npm run prisma:migrate:dev
+npm run dev               # Start development server
+npm run build             # Build the project
+npm run typecheck         # Run TypeScript type check
+npm run lint              # Run ESLint
+npm run format            # Run Prettier
+npm run prisma:generate   # Generate Prisma client
+npm run prisma:migrate:dev # Run Prisma migrations
+npm run create:module <name> # Scaffold a new module (uses a nested structure)
 ```
 
 ## Environment Notes
-- Environment validation lives in [src/config/env.config.ts](/home/reza/codeing/doctor-prescription/doctor-prescription-backend%20(Copy)/src/config/env.config.ts).
-- Keep JWT, Redis, CORS, and rate-limit variable names aligned with that file.
-- Redis is required for normal runtime startup.
+- Environment validation lives in [src/config/env.config.ts](src/config/env.config.ts).
+- Key variables: `DATABASE_URL`, `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`, `CORS_ORIGINS`.
+- AI providers (Gemini, OpenAI, Claude, Ollama) are supported via environment configuration.
 
 ## Architecture Rules
-- Keep controllers thin: parse request, call service, return response, forward errors.
-- Put business logic in services.
-- Use repositories for large or reused Prisma queries.
-- Keep modules isolated; shared code belongs in `src/shared/`.
-- Put bootstrap/setup logic in `src/bootstrap/`.
-- Put config in `src/config/`.
-- Prefer explicit, readable code over clever abstractions.
-
-## Module Layout
-Use the existing module pattern where applicable:
-
-```text
-module/
-  module.route.ts
-  module.controller.ts
-  module.service.ts
-  module.validation.ts
-  module.repository.ts
-  module.constants.ts
-  module.types.ts
-```
-
-Not every module needs every file, but new work should follow the prevailing structure in `src/modules/`.
+- **Flat Module Structure:** Existing modules follow a flat layout in `src/modules/<module>/`:
+  - `module.route.ts`
+  - `module.controller.ts`
+  - `module.service.ts`
+  - `module.validation.ts`
+  - `module.repository.ts`
+  - `module.constants.ts`
+  - `module.types.ts`
+- **Prisma Multi-Schema:** Prisma models are split across multiple files in the `prisma/` directory (e.g., `doctor.prisma`, `patient.prisma`).
+- **OpenAPI Documentation:** Documentation is centrally managed in `src/docs/openapi/`. Path definitions and schemas should be updated there when adding new endpoints.
+- **Thin Controllers:** Parse requests using Zod, call services, and return responses using `sendResponse`.
+- **Business Logic:** Keep business logic in services.
+- **Shared Code:** Utilities and shared logic belong in `src/shared/`.
+- **Response Format:** Always use `sendResponse` for successes and `AppError`/`globalErrorHandler` for errors to maintain consistent JSON shapes.
 
 ## API Rules
 - All externally exposed routes should remain versioned under `/api/v1`.
-- Keep response shapes consistent with existing helpers and middleware.
-- Include pagination metadata for list endpoints when relevant.
-- Do not add ad hoc response formats per controller.
+- Use the `Role` enum from `src/shared/constend/auth.const.ts` for authorization.
+- Roles: `SUPER_ADMIN`, `MR`, `DOCTOR`, `ASSISTANT`, `PATIENT`.
 
 ## Validation And Errors
-- Validate body, params, and query input with Zod.
-- Keep validation schemas close to the module that owns them.
-- Use centralized error handling.
-- Throw structured application errors, not raw strings.
-- Convert Prisma/database failures into API-safe errors.
+- Validate body, params, and query input with Zod using the `validateRequest` middleware.
+- Throw structured `AppError` instances, which are handled by `globalErrorHandler`.
+- Use `catchAsync` to wrap controller methods.
 
 ## Authorization And Tenant Safety
-- Enforce authentication and authorization in middleware/services, not inline controller logic unless unavoidable.
-- Use constants or enums for roles and permissions.
-- Any tenant-owned resource must be filtered by `tenantId`.
-- Never trust tenant scoping from the client.
-- Super-admin bypasses must be explicit.
-
-## Data And Transaction Rules
-- Use transactions for multi-step workflows such as onboarding, provisioning, or linked record creation.
-- Avoid large Prisma queries inside controllers.
-- Create a repository only when it improves readability or reuse; skip it for trivial CRUD.
-
-## Logging And Security
-- Log operationally important events and errors with context.
-- Use audit-style logging for sensitive actions.
-- Never log passwords, tokens, or secrets.
+- Use the `auth` middleware for protecting routes.
+- Tenant-owned resources must be scoped by `tenantId` (or `hospitalId` depending on the model).
 
 ## Working Style
-Before changing code:
-1. Inspect the existing module and adjacent patterns.
-2. Match current naming, file placement, and response conventions.
-3. Check whether a shared helper or utility already exists.
-4. Verify auth, tenant, and validation concerns before implementation.
+1. Match current naming, flat file placement, and response conventions.
+2. Check `src/shared/utils/` for helpers like `sendResponse`, `catchAsync`, `pagination`.
+3. Update OpenAPI documentation in `src/docs/openapi/` for any new routes or schema changes.
+4. If modifying the database, update the relevant `.prisma` file in `prisma/` and run `npm run prisma:generate`.
 
 ## Done Criteria
-A change is only complete when:
-- it follows the current project structure,
-- input validation exists where required,
-- authorization and tenant boundaries are preserved,
-- response formatting stays consistent,
-- no unrelated files are changed,
-- the code is type-safe and readable.
+- Change follows the flat module structure.
+- Input validation (Zod) is implemented via `validateRequest`.
+- Authorization (Roles) is enforced.
+- OpenAPI documentation is updated.
+- Response formatting uses `sendResponse`.
+- Code is type-safe and linted.

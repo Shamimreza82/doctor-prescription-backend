@@ -2,13 +2,11 @@ import { appConfig } from '@/config/app.config';
 import { envConfig } from '@/config/env.config';
 
 import { createApp } from './createApp';
-import { errorLogger, logger } from './logger';
-import { connectRedis } from './redis';
 
 import type { Server } from 'node:http';
 
 const shutdown = async (server: Server, signal: string): Promise<void> => {
-  logger.info({ signal }, 'Received shutdown signal');
+  console.info({ signal }, 'Received shutdown signal');
 
   await new Promise<void>((resolve, reject) => {
     server.close((error) => {
@@ -20,9 +18,7 @@ const shutdown = async (server: Server, signal: string): Promise<void> => {
       resolve();
     });
   });
-
-  // await disconnectRedis();
-  logger.info('Shutdown completed');
+  console.info('Shutdown completed');
 };
 
 export const startServer = async (): Promise<Server> => {
@@ -30,10 +26,9 @@ export const startServer = async (): Promise<Server> => {
 
   // startTelemetry();
   // await getPrisma().$connect();
-  await connectRedis();
 
   const server = app.listen(appConfig.port, appConfig.host, () => {
-    logger.info(
+    console.info(
       {
         event: 'SERVER_START',
         host: appConfig.host,
@@ -49,7 +44,7 @@ export const startServer = async (): Promise<Server> => {
   const handleSignal = (signal: 'SIGINT' | 'SIGTERM'): void => {
     void shutdown(server, signal)
       .catch((error: unknown) => {
-        errorLogger.error({ err: error }, 'Shutdown failed');
+        console.error({ err: error }, 'Shutdown failed');
       })
       .finally(() => {
         process.exit(0);
@@ -66,12 +61,12 @@ export const startServer = async (): Promise<Server> => {
 
   // TODO: add handlers for uncaught exceptions and unhandled promise rejections
   process.on('uncaughtException', (error) => {
-    errorLogger.fatal({ err: error }, 'Uncaught exception');
+    console.error({ err: error }, 'Uncaught exception');
     process.exit(1);
   });
 
   process.on('unhandledRejection', (reason) => {
-    errorLogger.fatal({ err: reason }, 'Unhandled rejection');
+    console.error({ err: reason }, 'Unhandled rejection');
     process.exit(1);
   });
 

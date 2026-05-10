@@ -1,5 +1,3 @@
-import { auditLogger } from '@/bootstrap/logger';
-
 export interface AuditEvent {
   action: string;
   entity: string;
@@ -12,5 +10,5 @@ export interface AuditEvent {
 }
 
 export const logAuditEvent = (event: AuditEvent): void => {
-  auditLogger.info({ ...event, eventType: 'AUDIT' }, 'Audit event');
+  console.info({ ...event, eventType: 'AUDIT' }, 'Audit event');
 };

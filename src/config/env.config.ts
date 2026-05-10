@@ -24,14 +24,8 @@ const envSchema = z.object({
   JWT_REFRESH_SECRET: z.string().min(16).default('dev-refress-secret-change-me'),
   JWT_ACCESS_EXPIRES_IN: z.string().min(1).default('15m'),
   JWT_REFRESH_EXPIRES_IN: z.string().min(1).default('365d'),
-
-  REDIS_URL: z.string().url().default('redis://127.0.0.1:6379'),
   LOG_LEVEL: z.enum(['trace', 'debug', 'info', 'warn', 'error', 'fatal']).default('info'),
   HTTP_LOG_LEVEL: z.enum(['trace', 'debug', 'info', 'warn', 'error', 'fatal']).default('info'),
-
-  REDIS_HOST: z.string().default('127.0.0.1'),
-  REDIS_PORT: z.coerce.number().int().positive().default(6379),
-  REDIS_PASSWORD: z.string().optional(),
 
   // Ai models and api keys
   GEMINI_API_KEY: z.string().optional(),
@@ -89,14 +83,9 @@ export const envConfig = {
   jwtRefreshSecret: parsed.data.JWT_REFRESH_SECRET,
   jwtRefreshExpiresIn: parsed.data.JWT_REFRESH_EXPIRES_IN,
 
-  redisUrl: parsed.data.REDIS_URL,
   logLevel: parsed.data.LOG_LEVEL as LogLevel,
   httpLogLevel: parsed.data.HTTP_LOG_LEVEL as LogLevel,
   corsEnabled: parsed.data.CORS_ENABLED,
-  redisHost: parsed.data.REDIS_HOST,
-  redisPort: parsed.data.REDIS_PORT,
-  redisPassword: parsed.data.REDIS_PASSWORD,
-
 
   ///ai api keys and model names
   geminiApiKey: parsed.data.GEMINI_API_KEY,

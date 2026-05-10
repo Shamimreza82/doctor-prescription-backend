@@ -7,10 +7,21 @@
 
 ## Current Active Modules
 - `auth`
+- `user`
 - `onboarding`
 - `patient`
+- `prescription`
+- `upload`
 
-There is also source code for other modules, but the current public API surface is defined by [src/routes/index.ts](/home/reza/codeing/doctor-prescription/doctor-prescription-backend%20(Copy)/src/routes/index.ts).
+Mounted routes currently come from [src/routes/index.ts](/home/reza/codeing/doctor-prescription/doc-prescription/doctor-prescription-backend/src/routes/index.ts):
+- `/auth`
+- `/user`
+- `/onboarding`
+- `/patients`
+- `/prescriptions`
+- `/files`
+
+Other modules and support code exist under `src/modules/`, but changes to public API should follow the mounted router list above.
 
 ## Common Commands
 ```bash
@@ -24,9 +35,10 @@ npm run prisma:migrate:dev
 ```
 
 ## Environment Notes
-- Environment validation lives in [src/config/env.config.ts](/home/reza/codeing/doctor-prescription/doctor-prescription-backend%20(Copy)/src/config/env.config.ts).
-- Keep JWT, Redis, CORS, and rate-limit variable names aligned with that file.
+- Environment validation lives in [src/config/env.config.ts](/home/reza/codeing/doctor-prescription/doc-prescription/doctor-prescription-backend/src/config/env.config.ts).
+- Keep JWT, Redis, CORS, host, trust-proxy, log-level, and rate-limit variable names aligned with that file.
 - Redis is required for normal runtime startup.
+- AI provider keys and model names are also validated there; if work touches AI integration, keep env naming aligned with that file.
 
 ## Architecture Rules
 - Keep controllers thin: parse request, call service, return response, forward errors.
@@ -35,6 +47,7 @@ npm run prisma:migrate:dev
 - Keep modules isolated; shared code belongs in `src/shared/`.
 - Put bootstrap/setup logic in `src/bootstrap/`.
 - Put config in `src/config/`.
+- Logger setup lives in `src/bootstrap/logger/`; prefer using the existing logging flow rather than introducing parallel logger wiring.
 - Prefer explicit, readable code over clever abstractions.
 
 ## Module Layout
@@ -55,7 +68,7 @@ Not every module needs every file, but new work should follow the prevailing str
 
 ## API Rules
 - All externally exposed routes should remain versioned under `/api/v1`.
-- Keep response shapes consistent with existing helpers and middleware.
+- Keep response shapes consistent with existing helpers and middleware, especially `src/shared/utils/sendResponse.ts`.
 - Include pagination metadata for list endpoints when relevant.
 - Do not add ad hoc response formats per controller.
 
@@ -65,6 +78,7 @@ Not every module needs every file, but new work should follow the prevailing str
 - Use centralized error handling.
 - Throw structured application errors, not raw strings.
 - Convert Prisma/database failures into API-safe errors.
+- Reuse shared helpers such as `AppError`, `catchAsync`, `sendError`, and pagination utilities when they fit the existing pattern.
 
 ## Authorization And Tenant Safety
 - Enforce authentication and authorization in middleware/services, not inline controller logic unless unavoidable.
@@ -82,13 +96,14 @@ Not every module needs every file, but new work should follow the prevailing str
 - Log operationally important events and errors with context.
 - Use audit-style logging for sensitive actions.
 - Never log passwords, tokens, or secrets.
+- Redis, BullMQ, and audit-related plumbing already live under `src/shared/queues/` and `src/shared/services/`; extend those patterns instead of creating one-off infrastructure code.
 
 ## Working Style
 Before changing code:
 1. Inspect the existing module and adjacent patterns.
 2. Match current naming, file placement, and response conventions.
-3. Check whether a shared helper or utility already exists.
-4. Verify auth, tenant, and validation concerns before implementation.
+3. Check whether a shared helper, queue, logger, or utility already exists.
+4. Verify auth, tenant, validation, and transaction concerns before implementation.
 
 ## Done Criteria
 A change is only complete when:

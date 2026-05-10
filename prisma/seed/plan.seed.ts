@@ -1,7 +1,5 @@
-
 import { BillingCycle } from '@prisma/client';
 
-import { logger } from '@/bootstrap/logger';
 import { prisma } from '@/bootstrap/prisma';
 
 
@@ -53,5 +51,5 @@ export const seedPlans = async () => {
     });
   }
 
-  logger.info('✅ Plans seeded successfully');
+  console.info('✅ Plans seeded successfully');
 };

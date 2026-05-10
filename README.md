@@ -1,6 +1,6 @@
 # doctor-prescription-backend
 
-TypeScript/Express backend for a doctor prescription platform. The service uses Prisma with PostgreSQL, Redis, BullMQ workers, Zod validation, and Swagger UI.
+TypeScript/Express backend for a doctor prescription platform. The service uses Prisma with PostgreSQL, Zod validation, and Swagger UI.
 
 ## Current Scope
 
@@ -32,11 +32,7 @@ Currently mounted routes:
 - Express 5
 - Prisma
 - PostgreSQL
-- Redis
-- BullMQ
 - Zod
-- Pino
-- Vitest
 
 ## Getting Started
 
@@ -66,9 +62,6 @@ JWT_ACCESS_SECRET=dev-access-secret-change-me
 JWT_REFRESH_SECRET=dev-refresh-secret-change-me
 JWT_ACCESS_EXPIRES_IN=15m
 JWT_REFRESH_EXPIRES_IN=365d
-REDIS_URL=redis://127.0.0.1:6379
-REDIS_HOST=127.0.0.1
-REDIS_PORT=6379
 LOG_LEVEL=debug
 HTTP_LOG_LEVEL=info
 ```
@@ -88,11 +81,7 @@ Optional seed flow:
 npx prisma db seed
 ```
 
-### 4. Start Redis
-
-Redis must be available before the app starts because workers and runtime services are initialized during bootstrap.
-
-### 5. Run the app
+### 4. Run the app
 
 ```bash
 npm run dev
@@ -116,10 +105,6 @@ npm run lint
 npm run lint:fix
 npm run format
 npm run format:check
-npm run test
-npm run test:coverage
-npm run test:watch
-npm run test:auth
 npm run prisma:generate
 npm run prisma:migrate:dev
 npm run prisma:migrate:deploy
@@ -138,8 +123,6 @@ src/
   modules/
   routes/
   shared/
-  tests/
-  workers/
 prisma/
   migrations/
   seed/

@@ -12,7 +12,6 @@ import globalErrorHandler from '@/middlewares/globalErrorHandler';
 import { requestContext } from '@/middlewares/requestContext';
 import { sendResponse } from '@/shared/utils/sendResponse';
 
-import { httpLogger } from './logger';
 import { appConfig } from '../config/app.config';
 import { openApiDocument } from '../docs/openapi';
 import { notFound } from '../middlewares/notFound';
@@ -20,8 +19,6 @@ import { rateLimiter } from '../middlewares/rateLimiter';
 import { apiRouter } from '../routes';
 
 import type { RequestHandler } from 'express';
-
-import '@/workers';
 
 
 export const createApp = () => {
@@ -32,7 +29,7 @@ export const createApp = () => {
     app.set('trust proxy', 1);
   }
 
-  app.use(httpLogger as unknown as RequestHandler);
+  // app.use(httpLogger as unknown as RequestHandler);
   app.use(helmet() as unknown as RequestHandler);
   app.use(cors(corsConfig));
   app.use(rateLimiter);

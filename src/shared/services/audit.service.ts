@@ -1,9 +1,7 @@
 import { Prisma } from '@prisma/client';
 
-import { errorLogger } from '@/bootstrap/logger';
+import { prisma } from '@/bootstrap/prisma';
 import { logAuditEvent } from '@/shared/logging/audit';
-
-import { auditQueue } from '../queues/audit.queue';
 
 interface TAuditLogInput {
   hospitalId?: string;
@@ -24,7 +22,24 @@ interface TAuditLogInput {
 
 export async function auditLog(data: TAuditLogInput) {
   try {
-    const job = await auditQueue.add('audit-log', data);
+    if (!data.hospitalId) {
+      throw new Error('Audit log requires hospitalId');
+    }
+
+    const createdAuditLog = await prisma.auditLog.create({
+      data: {
+        tenantId: data.hospitalId,
+        userId: data.userId,
+        module: data.module,
+        entity: data.entity,
+        entityId: data.entityId,
+        action: data.action,
+        oldValues: data.oldValues,
+        newValues: data.newValues,
+        ipAddress: data.ipAddress,
+        userAgent: data.userAgent,
+      },
+    });
 
     logAuditEvent({
       action: data.action,
@@ -34,12 +49,12 @@ export async function auditLog(data: TAuditLogInput) {
       hospitalId: data.hospitalId,
       ip: data.ipAddress,
       metadata: {
-        queueJobId: job.id,
+        auditLogId: createdAuditLog.id,
         module: data.module,
       },
     });
   } catch (error) {
-    errorLogger.error(
+    console.error(
       {
         err: error,
         action: data.action,
@@ -47,50 +62,9 @@ export async function auditLog(data: TAuditLogInput) {
         entityId: data.entityId,
         userId: data.userId,
       },
-      'Failed to enqueue audit log',
+      'Failed to persist audit log',
     );
 
     throw error;
   }
 }
-
-// export async function auditLog(data: TAuditLogInput) {
-//   try {
-//     await prisma.auditLog.create({
-//       data: {
-//         hospitalId: data.hospitalId,
-//         userId: data.userId,
-
-//         module: data.module,
-//         entity: data.entity,
-//         entityId: data.entityId,
-
-//         action: data.action,
-
-//         oldValues: data.oldValues,
-//         newValues: data.newValues,
-
-//         ipAddress: data.ipAddress,
-//         userAgent: data.userAgent,
-//       },
-//     });
-//   } catch (error) {
-//     console.error("Audit log failed:", error);
-//   }
-// }
-
-// Example usage:
-
-// await auditLog({
-//   hospitalId,
-//   userId: adminId,
-
-//   module: "USER",
-//   entity: "ROLE",
-//   entityId: targetUserId,
-
-//   action: "ROLE_CHANGE",
-
-//   oldValues: { role: "RECEPTIONIST" },
-//   newValues: { role: "ADMIN" }
-// });

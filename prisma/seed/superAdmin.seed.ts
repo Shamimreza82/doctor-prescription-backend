@@ -1,7 +1,6 @@
 import { Role, UserStatus, TenantStatus } from "@prisma/client";
 import bcrypt from "bcrypt";
 
-import { logger } from "@/bootstrap/logger";
 import { prisma } from "@/bootstrap/prisma";
 
 
@@ -14,7 +13,7 @@ export const seedSuperAdmin = async () => {
   });
 
   if (existing) {
-    logger.info("✅ Super Admin already exists");
+    console.info("✅ Super Admin already exists");
     return;
   }
 
@@ -73,5 +72,5 @@ export const seedSuperAdmin = async () => {
   //   data: { tenantId: tenant.id },
   // });
 
-  logger.info("🚀 Super Admin + Tenant created successfully");
+  console.info("🚀 Super Admin + Tenant created successfully");
 };

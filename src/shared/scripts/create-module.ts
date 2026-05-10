@@ -1,12 +1,10 @@
 import fs from 'fs';
 import path from 'path';
 
-import { logger } from '@/bootstrap/logger';
-
 const moduleName = process.argv[2];
 
 if (!moduleName) {
-  logger.error('❌ Please provide module name');
+  console.error('❌ Please provide module name');
   process.exit(1);
 }
 
@@ -80,7 +78,7 @@ export const ${moduleName}Routes = router;
 };`,
   );
 
-  logger.info(`✅ Module '${moduleName}' created successfully`);
+  console.info(`✅ Module '${moduleName}' created successfully`);
 } catch (error) {
-  logger.error({ err: error }, '❌ Error creating module:');
+  console.error({ err: error }, '❌ Error creating module:');
 }
