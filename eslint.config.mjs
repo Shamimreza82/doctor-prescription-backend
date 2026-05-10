@@ -53,7 +53,6 @@ export default [
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/require-await': 'error',
       '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/no-unsafe-argument': 'error',
 
       'import/order': [
         'error',

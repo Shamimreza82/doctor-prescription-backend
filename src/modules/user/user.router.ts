@@ -1,11 +1,11 @@
-import express from 'express';     
+import { Router } from 'express';
+import { auth } from '@/middlewares/auth';
+import { UserControllers } from './user.controller';
+import { Role } from '@/shared/constend/auth.const';
 
+const router = Router();
 
-const router = express.Router()
+router.get('/me', auth(...Object.values(Role)), UserControllers.getMyProfile);
+router.patch('/me', auth(...Object.values(Role)), UserControllers.updateMyProfile);
 
-// Define your user-related routes here
-// router.get('/', )
-
-
-
-export  const userRouter = router;
+export const userRouter = router;

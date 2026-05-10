@@ -1,103 +1,228 @@
+import { Prisma } from '@prisma/client';
 
-// import bcrypt from 'bcrypt'
+import { paginateResponse } from '@/shared/utils/paginateResponse';
+import { calculatePagination } from '@/shared/utils/pagination';
 
-// import { prisma } from '@/bootstrap/prisma';
-// import { AppError } from '@/shared/errors/AppError';
-// import { addDays } from '@/shared/utils/addDays';
-// import { generateSlug } from '@/shared/utils/generateSlug';
+import { DoctorRepository } from './doctor.repository';
+import {
+  TDoctorActor,
+  TDoctorListQuery,
+  TUpdateDoctorProfileInput,
+  TChamberInput,
+  TScheduleInput,
+  TFeeConfigInput,
+  TLeaveInput,
+} from './doctor.types';
+import { DoctorUtils } from './doctor.utils';
 
-// import { TDoctorRegisterInput } from './doctor.validation';
+const getMyProfile = async (actor: TDoctorActor) => {
+  const scope = DoctorUtils.resolveTenantScope(actor);
+  return DoctorUtils.getScopedDoctorOrThrow(scope.userId, scope.tenantId);
+};
 
+const updateProfile = async (actor: TDoctorActor, payload: TUpdateDoctorProfileInput) => {
+  const scope = DoctorUtils.resolveTenantScope(actor);
+  const doctor = await DoctorUtils.getScopedDoctorOrThrow(scope.userId, scope.tenantId);
 
+  const data: Prisma.DoctorUpdateInput = {
+    employeeId: payload.employeeId,
+    registrationNumber: payload.registrationNumber,
+    licenseNumber: payload.licenseNumber,
+    experienceYears: payload.experienceYears,
+    gender: payload.gender,
+    dateOfBirth: payload.dateOfBirth ? new Date(payload.dateOfBirth) : undefined,
+    bloodGroup: payload.bloodGroup,
+    bio: payload.bio,
+    address: payload.address,
+    emergencyContactName: payload.emergencyContactName,
+    emergencyContactPhone: payload.emergencyContactPhone,
+    isAvailable: payload.isAvailable,
+    consultationDuration: payload.consultationDuration,
+    status: payload.status,
+  };
 
+  return DoctorRepository.update(doctor.id, scope.tenantId, data);
+};
 
-// const createDoctor = async (payload: TDoctorRegisterInput) => {
-//   const { email, password, name, phone, planCode } = payload;
+const getDoctorById = async (actor: TDoctorActor, id: string) => {
+  const scope = DoctorUtils.resolveTenantScope(actor);
+  return DoctorUtils.getDoctorByIdOrThrow(id, scope.tenantId);
+};
 
-//   const plan = await prisma.plan.findUnique({
-//     where: { code: planCode }
-//   });
+const listDoctors = async (actor: TDoctorActor, query: TDoctorListQuery) => {
+  const { page, limit, skip } = calculatePagination(query);
+  const where = DoctorUtils.buildDoctorListWhere(actor, query);
+  const orderBy = DoctorUtils.buildOrderBy(query.sortBy, query.sortOrder);
 
-//   if (!plan) {
-//     throw new AppError(404, "Plan not found");
-//   }
+  const [data, total] = await Promise.all([
+    DoctorRepository.list(where, orderBy, skip, limit),
+    DoctorRepository.count(where),
+  ]);
 
+  return paginateResponse(data, total, page, limit);
+};
 
-//   const existingUser = await prisma.user.findFirst({
-//     where: {
-//       OR: [
-//         { email: email },
-//         { phone: phone }
-//       ]
-//     }
-//   });
+// Chamber Services
+const addChamber = async (actor: TDoctorActor, payload: TChamberInput) => {
+  const scope = DoctorUtils.resolveTenantScope(actor);
+  const doctor = await DoctorUtils.getScopedDoctorOrThrow(scope.userId, scope.tenantId);
 
-//   if (existingUser) {
-//     throw new AppError(409, "Doctor already exists with this email or phone");
-//   }
+  return DoctorRepository.createChamber({
+    ...payload,
+    doctor: { connect: { id: doctor.id } },
+  });
+};
 
+const getMyChambers = async (actor: TDoctorActor) => {
+  const scope = DoctorUtils.resolveTenantScope(actor);
+  const doctor = await DoctorUtils.getScopedDoctorOrThrow(scope.userId, scope.tenantId);
+  return DoctorRepository.listChambers(doctor.id);
+};
 
-//   await prisma.$transaction(async (tx) => {
-//     // all create logic here
-//     const tenant = await tx.tenant.create({
-//       data: {
-//         name: `${payload.name} Workspace`,
-//         slug: generateSlug(payload.name),
-//         status: "ACTIVE",
-//         isTrial: true,
-//         trialStartsAt: new Date(),
-//         trialEndsAt: addDays(new Date(), 7)
-//       }
-//     });
-//     const hashedPassword = await bcrypt.hash(password, 12);
+const updateChamber = async (actor: TDoctorActor, chamberId: string, payload: TChamberInput) => {
+  const scope = DoctorUtils.resolveTenantScope(actor);
+  const doctor = await DoctorUtils.getScopedDoctorOrThrow(scope.userId, scope.tenantId);
 
-//     const user = await tx.user.create({
-//       data: {
-//         tenantId: tenant.id,
-//         name: name,
-//         email: email,
-//         phone: phone,
-//         password: hashedPassword,
-//         role: "DOCTOR",
-//         status: "ACTIVE"
-//       }
-//     });
+  return DoctorRepository.updateChamber(chamberId, doctor.id, payload);
+};
 
+const deleteChamber = async (actor: TDoctorActor, chamberId: string) => {
+  const scope = DoctorUtils.resolveTenantScope(actor);
+  const doctor = await DoctorUtils.getScopedDoctorOrThrow(scope.userId, scope.tenantId);
 
-//     const tenantSetting = await tx.tenantSetting.create({
-//       data: {
-//         tenantId: tenant.id,
-//         timezone: "Asia/Dhaka",
-//         currency: "BDT",
-//         language: "en",
-//         defaultFollowUpDays: 7,
-//         prescriptionHeader: null,
-//         prescriptionFooter: null
-//       }
-//     });
+  return DoctorRepository.deleteChamber(chamberId, doctor.id);
+};
 
+// Schedule Services
+const addSchedule = async (actor: TDoctorActor, payload: TScheduleInput) => {
+  const scope = DoctorUtils.resolveTenantScope(actor);
+  const doctor = await DoctorUtils.getScopedDoctorOrThrow(scope.userId, scope.tenantId);
 
-//     const startsAt = new Date();
-//     const endsAt = addDays(startsAt, 7);
+  const { chamberId, ...rest } = payload;
 
-//     const subscription = await tx.subscription.create({
-//       data: {
-//         tenantId: tenant.id,
-//         planId: plan.id,
-//         status: "TRIALING",
-//         startsAt,
-//         endsAt,
-//       }
-//     });
+  return DoctorRepository.createSchedule({
+    ...rest,
+    doctor: { connect: { id: doctor.id } },
+    chamber: chamberId ? { connect: { id: chamberId } } : undefined,
+  });
+};
 
+const getMySchedules = async (actor: TDoctorActor) => {
+  const scope = DoctorUtils.resolveTenantScope(actor);
+  const doctor = await DoctorUtils.getScopedDoctorOrThrow(scope.userId, scope.tenantId);
+  return DoctorRepository.listSchedules(doctor.id);
+};
 
-//   });
+const updateSchedule = async (actor: TDoctorActor, scheduleId: string, payload: TScheduleInput) => {
+  const scope = DoctorUtils.resolveTenantScope(actor);
+  const doctor = await DoctorUtils.getScopedDoctorOrThrow(scope.userId, scope.tenantId);
 
-//   return true
-// };
+  const { chamberId, ...rest } = payload;
 
+  return DoctorRepository.updateSchedule(scheduleId, doctor.id, {
+    ...rest,
+    chamber: chamberId ? { connect: { id: chamberId } } : { disconnect: true },
+  });
+};
 
+const deleteSchedule = async (actor: TDoctorActor, scheduleId: string) => {
+  const scope = DoctorUtils.resolveTenantScope(actor);
+  const doctor = await DoctorUtils.getScopedDoctorOrThrow(scope.userId, scope.tenantId);
 
-// export const DoctorServices = {
-//   createDoctor
-// };
+  return DoctorRepository.deleteSchedule(scheduleId, doctor.id);
+};
+
+// Fee Config Services
+const updateFeeConfig = async (actor: TDoctorActor, payload: TFeeConfigInput) => {
+  const scope = DoctorUtils.resolveTenantScope(actor);
+  const doctor = await DoctorUtils.getScopedDoctorOrThrow(scope.userId, scope.tenantId);
+
+  const { id, chamberId, ...rest } = payload;
+
+  if (id) {
+    return DoctorRepository.updateFeeConfig(id, doctor.id, {
+      ...rest,
+      chamber: chamberId ? { connect: { id: chamberId } } : { disconnect: true },
+    });
+  }
+
+  return DoctorRepository.createFeeConfig({
+    ...rest,
+    doctor: { connect: { id: doctor.id } },
+    chamber: chamberId ? { connect: { id: chamberId } } : undefined,
+  });
+};
+
+const getMyFees = async (actor: TDoctorActor) => {
+  const scope = DoctorUtils.resolveTenantScope(actor);
+  const doctor = await DoctorUtils.getScopedDoctorOrThrow(scope.userId, scope.tenantId);
+  return DoctorRepository.listFeeConfigs(doctor.id);
+};
+
+const deleteFeeConfig = async (actor: TDoctorActor, feeConfigId: string) => {
+  const scope = DoctorUtils.resolveTenantScope(actor);
+  const doctor = await DoctorUtils.getScopedDoctorOrThrow(scope.userId, scope.tenantId);
+
+  return DoctorRepository.deleteFeeConfig(feeConfigId, doctor.id);
+};
+
+// Leave Services
+const addLeave = async (actor: TDoctorActor, payload: TLeaveInput) => {
+  const scope = DoctorUtils.resolveTenantScope(actor);
+  const doctor = await DoctorUtils.getScopedDoctorOrThrow(scope.userId, scope.tenantId);
+
+  return DoctorRepository.createLeave({
+    startDate: new Date(payload.startDate),
+    endDate: new Date(payload.endDate),
+    reason: payload.reason,
+    isFullDay: payload.isFullDay,
+    doctor: { connect: { id: doctor.id } },
+  });
+};
+
+const getMyLeaves = async (actor: TDoctorActor) => {
+  const scope = DoctorUtils.resolveTenantScope(actor);
+  const doctor = await DoctorUtils.getScopedDoctorOrThrow(scope.userId, scope.tenantId);
+  return DoctorRepository.listLeaves(doctor.id);
+};
+
+const updateLeave = async (actor: TDoctorActor, leaveId: string, payload: TLeaveInput) => {
+  const scope = DoctorUtils.resolveTenantScope(actor);
+  const doctor = await DoctorUtils.getScopedDoctorOrThrow(scope.userId, scope.tenantId);
+
+  return DoctorRepository.updateLeave(leaveId, doctor.id, {
+    startDate: payload.startDate ? new Date(payload.startDate) : undefined,
+    endDate: payload.endDate ? new Date(payload.endDate) : undefined,
+    reason: payload.reason,
+    isFullDay: payload.isFullDay,
+  });
+};
+
+const deleteLeave = async (actor: TDoctorActor, leaveId: string) => {
+  const scope = DoctorUtils.resolveTenantScope(actor);
+  const doctor = await DoctorUtils.getScopedDoctorOrThrow(scope.userId, scope.tenantId);
+
+  return DoctorRepository.deleteLeave(leaveId, doctor.id);
+};
+
+export const DoctorServices = {
+  getMyProfile,
+  updateProfile,
+  getDoctorById,
+  listDoctors,
+  addChamber,
+  getMyChambers,
+  updateChamber,
+  deleteChamber,
+  addSchedule,
+  getMySchedules,
+  updateSchedule,
+  deleteSchedule,
+  updateFeeConfig,
+  getMyFees,
+  deleteFeeConfig,
+  addLeave,
+  getMyLeaves,
+  updateLeave,
+  deleteLeave,
+};

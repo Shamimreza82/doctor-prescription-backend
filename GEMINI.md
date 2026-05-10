@@ -10,6 +10,7 @@
 Mounted routes in [src/routes/index.ts](src/routes/index.ts):
 - `auth` -> `/auth`
 - `user` -> `/user`
+- `doctors` -> `/doctors`
 - `onboarding` -> `/onboarding`
 - `patients` -> `/patients`
 - `prescriptions` -> `/prescriptions`
@@ -63,6 +64,16 @@ npm run create:module <name> # Scaffold a new module (uses a nested structure)
 ## Authorization And Tenant Safety
 - Use the `auth` middleware for protecting routes.
 - Tenant-owned resources must be scoped by `tenantId` (or `hospitalId` depending on the model).
+
+## TypeScript & Typing Standards
+- **Strict Typing:** Avoid `any` at all costs. Use specific types/interfaces or `unknown` if necessary.
+- **Controller Request Casting:** Always explicitly cast `req.body`, `req.params`, and `req.query` in controllers to their corresponding types:
+    - `req.body as TInput`
+    - `req.query as unknown as TQuery`
+    - `req.params['id'] as string`
+- **Centralized Messaging:** All success response messages must be defined in `module.constants.ts` (or `module.consted.ts`) and imported into the controller.
+- **Type Definitions:** Keep all module-specific interfaces and types in `module.types.ts`.
+- **Linting:** Always run `npm run lint` before completing a task. No new lint errors or warnings should be introduced.
 
 ## Working Style
 1. Match current naming, flat file placement, and response conventions.
