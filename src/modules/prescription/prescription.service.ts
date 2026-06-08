@@ -23,21 +23,12 @@ import type {
   TPrescriptionUpdateInput,
 } from './prescription.types';
 
-
-
-
-
-
 const createPrescription = async (actor: TPrescriptionActor, payload: TPrescriptionCreateInput) => {
-
-
   const scope = PrescriptionUtils.resolveTenantScope(actor);
 
   if (!scope.tenantId) {
     throw new AppError(StatusCodes.BAD_REQUEST, PRESCRIPTION_MESSAGES.TENANT_REQUIRED);
   }
-
-
 
   await PrescriptionUtils.getPatientOrThrow(payload.patientId, scope);
   const doctorId = await PrescriptionUtils.getDoctorIdOrThrow(actor, scope, payload.doctorId);
@@ -65,12 +56,12 @@ const createPrescription = async (actor: TPrescriptionActor, payload: TPrescript
       },
       ...(payload.visitId
         ? {
-          visit: {
-            connect: {
-              id: payload.visitId,
+            visit: {
+              connect: {
+                id: payload.visitId,
+              },
             },
-          },
-        }
+          }
         : {}),
       prescriptionNumber: payload.prescriptionNumber ?? PrescriptionUtils.buildPrescriptionNumber(),
       status: payload.status ?? PrescriptionStatus.DRAFT,
@@ -92,7 +83,12 @@ const listPrescriptions = async (actor: TPrescriptionActor, query: TPrescription
   const { page, limit, skip } = calculatePagination(query);
   const where = PrescriptionUtils.buildPrescriptionListWhere(scope, query);
   const orderBy = PrescriptionUtils.buildOrderBy(query.sortBy, query.sortOrder);
-  const { data, total } = await PrescriptionRepository.listPrescriptions(where, orderBy, skip, limit);
+  const { data, total } = await PrescriptionRepository.listPrescriptions(
+    where,
+    orderBy,
+    skip,
+    limit,
+  );
 
   return paginateResponse(data, total, page, limit);
 };
@@ -107,7 +103,10 @@ const updatePrescription = async (
   prescriptionId: string,
   payload: TPrescriptionUpdateInput,
 ) => {
-  const current = await PrescriptionUtils.getScopedPrescriptionOrThrow(prescriptionId, PrescriptionUtils.resolveTenantScope(actor, payload.tenantId));
+  const current = await PrescriptionUtils.getScopedPrescriptionOrThrow(
+    prescriptionId,
+    PrescriptionUtils.resolveTenantScope(actor, payload.tenantId),
+  );
   const scope = PrescriptionUtils.resolveTenantScope(actor, current.tenantId);
 
   const nextPatientId = payload.patientId ?? current.patientId;
@@ -139,13 +138,13 @@ const updatePrescription = async (
   if (payload.visitId !== undefined) {
     data.visit = payload.visitId
       ? {
-        connect: {
-          id: payload.visitId,
-        },
-      }
+          connect: {
+            id: payload.visitId,
+          },
+        }
       : {
-        disconnect: true,
-      };
+          disconnect: true,
+        };
   }
 
   if (payload.prescriptionNumber !== undefined) {
@@ -206,10 +205,8 @@ const archivePrescription = async (actor: TPrescriptionActor, prescriptionId: st
 };
 
 const getFinalPrescriptionData = async (
-  prescriptionId: string
+  prescriptionId: string,
 ): Promise<TPrescriptionPrintData> => {
-
-
   if (!prescriptionId) {
     throw new AppError(400, 'Prescription ID is required');
   }
@@ -217,41 +214,40 @@ const getFinalPrescriptionData = async (
 
   if (!prescription) {
     throw new AppError(StatusCodes.NOT_FOUND, 'Prescription not found');
-  } 
+  }
 
   console.log('Fetched prescription data:', prescription);
 
-{
-
-  return {
-    id: prescription.id,
-    prescriptionNo: prescription.prescriptionNumber,
-    tenantId: prescription.tenantId,
-    issuedAt: prescription.issuedAt ? prescription.issuedAt.toISOString() : '',
-    patient: {
-      name: `${prescription.patient.firstName} ${prescription.patient.lastName ?? ''}`.trim(),
-      age: 32,
-      gender: 'Not specified',
-      phone: prescription.patient.phone ?? 'Not specified',
-    },
-    doctor: {
-      name: prescription.doctor.user.name,
-      designation: 'General Physician',
-      registrationNo: prescription.doctor.registrationNumber ?? 'Not specified',
-    },
-    diagnosis: prescription.diagnosis ?? 'Not specified',
-    medicines: prescription.items.map((item) => ({
-      name: item.medicineName,
-      strength: item.dosage ?? 'Not specified',
-      dosage: item.dosage ?? 'Not specified',
-      duration: `${item.durationValue ?? 'N/A'} ${item.durationUnit ?? ''}`.trim(),
-      instructions: item.instruction ?? 'No specific instructions',
-    })),
-    advice: prescription.advice ? [prescription.advice] : [],
-    followUpDate: prescription.followUpDate ? prescription.followUpDate.toISOString() : undefined,
-  };
+  {
+    return {
+      id: prescription.id,
+      prescriptionNo: prescription.prescriptionNumber,
+      tenantId: prescription.tenantId,
+      issuedAt: prescription.issuedAt ? prescription.issuedAt.toISOString() : '',
+      patient: {
+        name: `${prescription.patient.firstName} ${prescription.patient.lastName ?? ''}`.trim(),
+        age: 32,
+        gender: 'Not specified',
+        phone: prescription.patient.phone ?? 'Not specified',
+      },
+      doctor: {
+        name: prescription.doctor.user.name,
+        designation: 'General Physician',
+        registrationNo: prescription.doctor.registrationNumber ?? 'Not specified',
+      },
+      diagnosis: prescription.diagnosis ?? 'Not specified',
+      medicines: prescription.items.map((item) => ({
+        name: item.medicineName,
+        strength: item.dosage ?? 'Not specified',
+        dosage: item.dosage ?? 'Not specified',
+        duration: `${item.durationValue ?? 'N/A'} ${item.durationUnit ?? ''}`.trim(),
+        instructions: item.instruction ?? 'No specific instructions',
+      })),
+      advice: prescription.advice ? [prescription.advice] : [],
+      followUpDate: prescription.followUpDate ? prescription.followUpDate.toISOString() : undefined,
+    };
+  }
 };
-}
 
 const generatePdf = async (actor: TPrescriptionActor, prescriptionId: string) => {
   const data = await getFinalPrescriptionData(prescriptionId);
@@ -270,12 +266,7 @@ const generatePdf = async (actor: TPrescriptionActor, prescriptionId: string) =>
   const fileName = `rx-${data.prescriptionNo}.pdf`;
 
   // storage key -> save in DB if needed
-  const storageKey = path.join(
-    'tenants',
-    tenantId,
-    'prescriptions',
-    fileName
-  );
+  const storageKey = path.join('tenants', tenantId, 'prescriptions', fileName);
 
   // absolute path -> for writing file
   const absolutePath = path.join(process.cwd(), 'uploads', storageKey);
@@ -305,8 +296,6 @@ const generatePdf = async (actor: TPrescriptionActor, prescriptionId: string) =>
     },
   });
 
-
-
   return {
     prescriptionId,
     fileName,
@@ -321,12 +310,7 @@ const generatePdf = async (actor: TPrescriptionActor, prescriptionId: string) =>
 const getPdfFilePath = async (prescriptionId: string) => {
   const data = await getFinalPrescriptionData(prescriptionId);
   const fileName = `rx-${data.prescriptionNo}.pdf`;
-  const filePath = path.join(
-    process.cwd(),
-    'uploads',
-    'prescriptions',
-    fileName
-  );
+  const filePath = path.join(process.cwd(), 'uploads', 'prescriptions', fileName);
 
   try {
     await access(filePath);
@@ -339,8 +323,6 @@ const getPdfFilePath = async (prescriptionId: string) => {
     filePath,
   };
 };
-
-
 
 export const PrescriptionServices = {
   createPrescription,

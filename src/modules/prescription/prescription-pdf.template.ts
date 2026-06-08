@@ -124,7 +124,7 @@ const generateHtml = (data: TPrescriptionPrintData) => {
                 <td>${escapeHtml(m.duration)}</td>
                 <td>${escapeHtml(m.instructions ?? '')}</td>
               </tr>
-            `
+            `,
               )
               .join('')}
           </tbody>
@@ -134,9 +134,7 @@ const generateHtml = (data: TPrescriptionPrintData) => {
       <div class="section">
         <div class="label">Advice</div>
         <ul>
-          ${(data.advice ?? [])
-            .map((item) => `<li>${escapeHtml(item)}</li>`)
-            .join('')}
+          ${(data.advice ?? []).map((item) => `<li>${escapeHtml(item)}</li>`).join('')}
         </ul>
       </div>
 

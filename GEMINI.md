@@ -1,13 +1,16 @@
 # doctor-prescription-backend Agent Guide
 
 ## Project Summary
+
 - Backend API for a doctor prescription platform.
 - Stack: Node.js 20+, Express 5, TypeScript 5.9, Prisma 7, PostgreSQL.
 - API routes are mounted under `/api/v1`.
 - API Documentation (OpenAPI/Swagger) is available at `/docs`.
 
 ## Current Active Modules
+
 Mounted routes in [src/routes/index.ts](src/routes/index.ts):
+
 - `auth` -> `/auth`
 - `user` -> `/user`
 - `doctors` -> `/doctors`
@@ -19,6 +22,7 @@ Mounted routes in [src/routes/index.ts](src/routes/index.ts):
 Other modules like `ai` and `doctor` exist but may not be fully mounted yet.
 
 ## Common Commands
+
 ```bash
 npm run dev               # Start development server
 npm run build             # Build the project
@@ -31,11 +35,13 @@ npm run create:module <name> # Scaffold a new module (uses a nested structure)
 ```
 
 ## Environment Notes
+
 - Environment validation lives in [src/config/env.config.ts](src/config/env.config.ts).
 - Key variables: `DATABASE_URL`, `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`, `CORS_ORIGINS`.
 - AI providers (Gemini, OpenAI, Claude, Ollama) are supported via environment configuration.
 
 ## Architecture Rules
+
 - **Flat Module Structure:** Existing modules follow a flat layout in `src/modules/<module>/`:
   - `module.route.ts`
   - `module.controller.ts`
@@ -52,36 +58,42 @@ npm run create:module <name> # Scaffold a new module (uses a nested structure)
 - **Response Format:** Always use `sendResponse` for successes and `AppError`/`globalErrorHandler` for errors to maintain consistent JSON shapes.
 
 ## API Rules
+
 - All externally exposed routes should remain versioned under `/api/v1`.
 - Use the `Role` enum from `src/shared/constend/auth.const.ts` for authorization.
 - Roles: `SUPER_ADMIN`, `MR`, `DOCTOR`, `ASSISTANT`, `PATIENT`.
 
 ## Validation And Errors
+
 - Validate body, params, and query input with Zod using the `validateRequest` middleware.
 - Throw structured `AppError` instances, which are handled by `globalErrorHandler`.
 - Use `catchAsync` to wrap controller methods.
 
 ## Authorization And Tenant Safety
+
 - Use the `auth` middleware for protecting routes.
 - Tenant-owned resources must be scoped by `tenantId` (or `hospitalId` depending on the model).
 
 ## TypeScript & Typing Standards
+
 - **Strict Typing:** Avoid `any` at all costs. Use specific types/interfaces or `unknown` if necessary.
 - **Controller Request Casting:** Always explicitly cast `req.body`, `req.params`, and `req.query` in controllers to their corresponding types:
-    - `req.body as TInput`
-    - `req.query as unknown as TQuery`
-    - `req.params['id'] as string`
+  - `req.body as TInput`
+  - `req.query as unknown as TQuery`
+  - `req.params['id'] as string`
 - **Centralized Messaging:** All success response messages must be defined in `module.constants.ts` (or `module.consted.ts`) and imported into the controller.
 - **Type Definitions:** Keep all module-specific interfaces and types in `module.types.ts`.
 - **Linting:** Always run `npm run lint` before completing a task. No new lint errors or warnings should be introduced.
 
 ## Working Style
+
 1. Match current naming, flat file placement, and response conventions.
 2. Check `src/shared/utils/` for helpers like `sendResponse`, `catchAsync`, `pagination`.
 3. Update OpenAPI documentation in `src/docs/openapi/` for any new routes or schema changes.
 4. If modifying the database, update the relevant `.prisma` file in `prisma/` and run `npm run prisma:generate`.
 
 ## Done Criteria
+
 - Change follows the flat module structure.
 - Input validation (Zod) is implemented via `validateRequest`.
 - Authorization (Roles) is enforced.

@@ -1,7 +1,7 @@
-export type TAiProvider = "gemini" | "openai" | "claude" | "ollama";
-export type TAiTask = "prescription_draft" | "patient_summary" | "lab_analysis";
+export type TAiProvider = 'gemini' | 'openai' | 'claude' | 'ollama';
+export type TAiTask = 'prescription_draft' | 'patient_summary' | 'lab_analysis';
 
-export type TAiMessageRole = "system" | "user" | "assistant";
+export type TAiMessageRole = 'system' | 'user' | 'assistant';
 
 export interface TAiMessage {
   role: TAiMessageRole;
@@ -15,14 +15,13 @@ export interface TChatInput {
   maxOutputTokens?: number;
 }
 
-
 export interface TTextInput {
   prompt: string;
   systemInstruction?: string;
   model?: string;
   temperature?: number;
   maxOutputTokens?: number;
-  thinkingLevel?: "LOW" | "MEDIUM" | "HIGH" | " MINIMAL" | "THINKING_LEVEL_UNSPECIFIED";
+  thinkingLevel?: 'LOW' | 'MEDIUM' | 'HIGH' | ' MINIMAL' | 'THINKING_LEVEL_UNSPECIFIED';
 }
 
 export interface TImageGenerateInput {

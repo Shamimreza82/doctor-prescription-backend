@@ -1,8 +1,12 @@
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
+
 import { catchAsync } from '@/shared/utils/catchAsync';
 import { sendResponse } from '@/shared/utils/sendResponse';
+
 import { UserServices } from './user.service';
+
+import type { TUpdateUserProfileInput } from './user.types';
 
 const getMyProfile = catchAsync(async (req: Request, res: Response) => {
   const result = await UserServices.getMyProfile(req.user);
@@ -15,7 +19,7 @@ const getMyProfile = catchAsync(async (req: Request, res: Response) => {
 });
 
 const updateMyProfile = catchAsync(async (req: Request, res: Response) => {
-  const result = await UserServices.updateMyProfile(req.user, req.body);
+  const result = await UserServices.updateMyProfile(req.user, req.body as TUpdateUserProfileInput);
 
   sendResponse(res, StatusCodes.OK, {
     success: true,

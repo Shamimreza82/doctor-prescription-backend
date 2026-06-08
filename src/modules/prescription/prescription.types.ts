@@ -2,7 +2,6 @@ import type { TQueryOptions } from '@/types/pagination.types';
 
 import type { PrescriptionStatus, Prisma } from '@prisma/client';
 
-
 export interface TPrescriptionActor {
   userId: string;
   tenantId?: string | null;
@@ -74,10 +73,6 @@ export interface TPrescriptionListQuery extends TQueryOptions {
   issuedTo?: Date;
 }
 
-
-
-
-
 export interface TPrescriptionPrintData {
   id: string;
   prescriptionNo: string;
@@ -105,6 +100,3 @@ export interface TPrescriptionPrintData {
   advice?: string[];
   followUpDate?: string;
 }
-
-
-

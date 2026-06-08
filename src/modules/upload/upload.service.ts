@@ -19,7 +19,6 @@ import type {
   TUploadedFile,
 } from './upload.types';
 
-
 const unlinkFile = async (storageKey: string) => {
   try {
     await fs.unlink(storageKey);
@@ -32,16 +31,11 @@ const unlinkFile = async (storageKey: string) => {
   }
 };
 
-const uploadFile = async (
-  actor: TUploadActor,
-  payload: TCreateFileInput,
-  file?: TUploadedFile,
-) => {
+const uploadFile = async (actor: TUploadActor, payload: TCreateFileInput, file?: TUploadedFile) => {
+  //   console.log(file)
 
-//   console.log(file)
-
-// return
-  const { entityType, entityId } = {...payload}
+  // return
+  const { entityType, entityId } = { ...payload };
 
   if (!file) {
     throw new AppError(StatusCodes.BAD_REQUEST, FILE_MESSAGES.FILE_REQUIRED);
@@ -49,7 +43,6 @@ const uploadFile = async (
 
   try {
     const scope = UploadUtils.resolveTenantScope(actor, actor.tenantId);
-
 
     if (!scope.tenantId) {
       throw new AppError(StatusCodes.BAD_REQUEST, FILE_MESSAGES.TENANT_REQUIRED);
@@ -90,7 +83,6 @@ const listFiles = async (actor: TUploadActor, query: TListFilesQuery) => {
   const where = UploadUtils.buildFileListWhere(scope, query);
   const orderBy = UploadUtils.buildOrderBy(query.sortBy, query.sortOrder);
 
-  
   const { data, total } = await UploadRepository.listFiles(where, orderBy, skip, limit);
 
   return paginateResponse(data, total, page, limit);

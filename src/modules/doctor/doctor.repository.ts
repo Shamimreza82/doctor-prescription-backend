@@ -44,7 +44,7 @@ export const DoctorRepository = {
     where: Prisma.DoctorWhereInput,
     orderBy: Prisma.DoctorOrderByWithRelationInput,
     skip: number,
-    take: number
+    take: number,
   ) {
     return prisma.doctor.findMany({
       where,
@@ -76,13 +76,13 @@ export const DoctorRepository = {
   async updateChamber(id: string, doctorId: string, data: Prisma.DoctorChamberUpdateInput) {
     return prisma.doctorChamber.update({
       where: { id, doctorId },
-      data
+      data,
     });
   },
 
   async deleteChamber(id: string, doctorId: string) {
     return prisma.doctorChamber.delete({
-      where: { id, doctorId }
+      where: { id, doctorId },
     });
   },
 
@@ -95,7 +95,7 @@ export const DoctorRepository = {
       where: {
         id,
         ...(doctorId ? { doctorId } : {}),
-      }
+      },
     });
   },
 
@@ -107,13 +107,13 @@ export const DoctorRepository = {
   async updateSchedule(id: string, doctorId: string, data: Prisma.DoctorScheduleUpdateInput) {
     return prisma.doctorSchedule.update({
       where: { id, doctorId },
-      data
+      data,
     });
   },
 
   async deleteSchedule(id: string, doctorId: string) {
     return prisma.doctorSchedule.delete({
-      where: { id, doctorId }
+      where: { id, doctorId },
     });
   },
 
@@ -129,7 +129,7 @@ export const DoctorRepository = {
       where: {
         id,
         ...(doctorId ? { doctorId } : {}),
-      }
+      },
     });
   },
 
@@ -141,13 +141,13 @@ export const DoctorRepository = {
   async updateFeeConfig(id: string, doctorId: string, data: Prisma.DoctorFeeConfigUpdateInput) {
     return prisma.doctorFeeConfig.update({
       where: { id, doctorId },
-      data
+      data,
     });
   },
 
   async deleteFeeConfig(id: string, doctorId: string) {
     return prisma.doctorFeeConfig.delete({
-      where: { id, doctorId }
+      where: { id, doctorId },
     });
   },
 
@@ -163,7 +163,7 @@ export const DoctorRepository = {
       where: {
         id,
         ...(doctorId ? { doctorId } : {}),
-      }
+      },
     });
   },
 
@@ -175,13 +175,13 @@ export const DoctorRepository = {
   async updateLeave(id: string, doctorId: string, data: Prisma.DoctorLeaveUpdateInput) {
     return prisma.doctorLeave.update({
       where: { id, doctorId },
-      data
+      data,
     });
   },
 
   async deleteLeave(id: string, doctorId: string) {
     return prisma.doctorLeave.delete({
-      where: { id, doctorId }
+      where: { id, doctorId },
     });
   },
 
@@ -194,7 +194,7 @@ export const DoctorRepository = {
       where: {
         id,
         ...(doctorId ? { doctorId } : {}),
-      }
+      },
     });
   },
 };

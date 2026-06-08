@@ -1,7 +1,7 @@
-import multer from "multer";
+import multer from 'multer';
 
-import { MAX_FILE_SIZE_BYTES } from "@/modules/upload/upload.constand";
-import { UploadUtils } from "@/modules/upload/upload.utlis";
+import { MAX_FILE_SIZE_BYTES } from '@/modules/upload/upload.constand';
+import { UploadUtils } from '@/modules/upload/upload.utlis';
 
 const storage = multer.diskStorage({
   destination: (_req, _file, cb) => {
@@ -12,8 +12,6 @@ const storage = multer.diskStorage({
   },
 });
 
-
-
 const upload = multer({
   storage,
   limits: {
@@ -21,14 +19,10 @@ const upload = multer({
   },
 });
 
-
 export const MulterConfig = {
   upload,
   storage,
   limits: {
     fileSize: MAX_FILE_SIZE_BYTES,
   },
-};  
-
-
-
+};

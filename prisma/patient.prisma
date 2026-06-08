@@ -217,8 +217,31 @@ model Visit {
   deletedAt DateTime? @map("deleted_at")
 
   prescriptions Prescription[]
+  vitals        VisitVitals?
 
   @@map("visits")
+}
+
+model VisitVitals {
+  id      String @id @default(uuid())
+  visitId String @unique @map("visit_id")
+  visit   Visit  @relation(fields: [visitId], references: [id], onDelete: Cascade)
+
+  systolicBp      Int?   @map("systolic_bp")
+  diastolicBp     Int?   @map("diastolic_bp")
+  pulseRate       Int?   @map("pulse_rate")
+  temperature     Float?
+  respiratoryRate Int?   @map("respiratory_rate")
+  spO2            Int?   @map("spo2")
+  bmi             Float?
+  weightKg        Float? @map("weight_kg")
+  heightCm        Float? @map("height_cm")
+  notes           String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("visit_vitals")
 }
 
 enum VisitType {

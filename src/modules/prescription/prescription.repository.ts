@@ -40,7 +40,6 @@ const prescriptionInclude = {
   },
 } satisfies Prisma.PrescriptionInclude;
 
-
 const findFirstPrescription = async (where: Prisma.PrescriptionWhereInput) => {
   return prisma.prescription.findFirst({
     where,
@@ -171,7 +170,6 @@ const findVisitById = async (visitId: string) => {
   });
 };
 
-
 export const PrescriptionRepository = {
   prescriptionInclude,
   findFirstPrescription,
@@ -182,5 +180,5 @@ export const PrescriptionRepository = {
   findDoctorById,
   findDoctorByUserId,
   findVisitById,
-  getPrescriptionById
+  getPrescriptionById,
 };

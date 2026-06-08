@@ -34,8 +34,18 @@ const chamberSchema = z.object({
 const scheduleSchema = z.object({
   body: z.object({
     chamberId: z.string().optional(),
-    dayOfWeek: z.enum(['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY']),
-    startTime: z.string().regex(/^([01]\d|2[0-3]):?([0-5]\d)$/, 'Invalid start time format (HH:mm)'),
+    dayOfWeek: z.enum([
+      'MONDAY',
+      'TUESDAY',
+      'WEDNESDAY',
+      'THURSDAY',
+      'FRIDAY',
+      'SATURDAY',
+      'SUNDAY',
+    ]),
+    startTime: z
+      .string()
+      .regex(/^([01]\d|2[0-3]):?([0-5]\d)$/, 'Invalid start time format (HH:mm)'),
     endTime: z.string().regex(/^([01]\d|2[0-3]):?([0-5]\d)$/, 'Invalid end time format (HH:mm)'),
     maxPatients: z.number().optional(),
     slotDuration: z.number().optional(),

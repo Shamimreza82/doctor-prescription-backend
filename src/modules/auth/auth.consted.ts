@@ -1,4 +1,3 @@
-
 export const AUTH_MESSAGES = {
   REGISTER_SUCCESS: 'User registered successfully',
   LOGIN_SUCCESS: 'User logged in successfully',
@@ -11,5 +10,3 @@ export const AUTH_MESSAGES = {
   INVALID_REFRESH_TOKEN: 'Invalid refresh token',
   ME_SUCCESS: 'User profile retrieved successfully',
 } as const;
-
-

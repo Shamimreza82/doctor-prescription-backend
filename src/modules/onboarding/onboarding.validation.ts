@@ -19,4 +19,3 @@ export const OnboardingValidationSchemas = {
 };
 
 export type TOnboardingInput = z.infer<typeof onboardingRegisterSchema>['body'];
-

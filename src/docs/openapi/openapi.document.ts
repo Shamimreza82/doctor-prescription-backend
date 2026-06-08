@@ -6,8 +6,7 @@ export const openApiDocument = {
   info: {
     title: 'Doctor Prescription Backend API',
     version: '1.0.0',
-    description:
-      'API documentation for the currently mounted root, auth, onboarding, and patient endpoints.',
+    description: 'Comprehensive API documentation for the Doctor Prescription Backend system.',
   },
   servers: [
     {
@@ -19,7 +18,16 @@ export const openApiDocument = {
       description: 'Root server',
     },
   ],
-  tags: [{ name: 'Health' }, { name: 'Auth' }, { name: 'Onboarding' }, { name: 'Patients' }],
+  tags: [
+    { name: 'Health' },
+    { name: 'Auth' },
+    { name: 'User' },
+    { name: 'Onboarding' },
+    { name: 'Doctors' },
+    { name: 'Patients' },
+    { name: 'Prescriptions' },
+    { name: 'Files' },
+  ],
   paths,
   components: {
     securitySchemes: {

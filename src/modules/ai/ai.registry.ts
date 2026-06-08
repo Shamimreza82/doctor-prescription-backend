@@ -1,9 +1,7 @@
+import { GeminiProvider } from './providers/gemini.provider';
+import { OllamaProvider } from './providers/ollama.provider';
 
-
-import { GeminiProvider } from "./providers/gemini.provider";
-import { OllamaProvider } from "./providers/ollama.provider";
-
-import type { IAiProvider, TAiProvider } from "./ai.types";
+import type { IAiProvider, TAiProvider } from './ai.types';
 
 const providers: Partial<Record<TAiProvider, IAiProvider>> = {
   gemini: new GeminiProvider(),

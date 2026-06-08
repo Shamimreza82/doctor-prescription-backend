@@ -13,16 +13,12 @@ export interface TJwtPayload {
   role: string;
 }
 
-
-
-
 export const refreshTokenCookieOptions = {
   httpOnly: true,
   secure: envConfig.nodeEnv === 'production',
   sameSite: 'lax' as const,
   path: '/',
 };
-
 
 export const findUserByEmail = async (email: string, tenantId?: string) => {
   return prisma.user.findFirst({
@@ -67,15 +63,8 @@ export const verifyRefreshToken = (token: string): JwtPayload => {
   return jwt.verify(token, envConfig.jwtRefreshSecret) as JwtPayload;
 };
 
-
-
-
-
 export const assertActiveUser = (status?: string | null) => {
   if (status === 'INACTIVE' || status === 'LOCKED' || status === 'SUSPENDED') {
-    throw new AppError(
-      StatusCodes.LOCKED,
-      `Account temporarily ${status}, please contect admin`,
-    );
+    throw new AppError(StatusCodes.LOCKED, `Account temporarily ${status}, please contect admin`);
   }
 };

@@ -1,11 +1,19 @@
 export const PATIENT_MESSAGES = {
   CREATED: 'Patient created successfully',
-  LIST_RETRIEVED: 'Patients retrieved successfully',
   RETRIEVED: 'Patient retrieved successfully',
+  LIST_RETRIEVED: 'Patients retrieved successfully',
   UPDATED: 'Patient updated successfully',
   ARCHIVED: 'Patient archived successfully',
   NOT_FOUND: 'Patient not found',
-  TENANT_REQUIRED: 'Tenant ID is required for patient operations',
-} as const;
-
-export const PATIENT_SORT_FIELDS = ['createdAt', 'name'] as const;
+  TENANT_REQUIRED: 'Tenant ID is required',
+  VISIT_CREATED: 'Visit created successfully',
+  VISIT_RETRIEVED: 'Visit retrieved successfully',
+  VISIT_UPDATED: 'Visit updated successfully',
+  VISIT_NOT_FOUND: 'Visit not found',
+  MEDICAL_PROFILE_RETRIEVED: 'Medical profile retrieved successfully',
+  MEDICAL_PROFILE_UPDATED: 'Medical profile updated successfully',
+  VITALS_RECORDED: 'Vitals recorded successfully',
+  VITALS_RETRIEVED: 'Vitals retrieved successfully',
+  VITALS_UPDATED: 'Vitals updated successfully',
+  VITALS_NOT_FOUND: 'Vitals not found',
+};

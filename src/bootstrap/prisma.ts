@@ -18,14 +18,11 @@ if (envConfig.nodeEnv !== 'production') {
   globalForPrisma.prisma = prisma;
 }
 
-
 ///// in future use case
 
 // import { PrismaClient } from "@prisma/client";
 
 // import { generateId } from "@/shared/utils/generateId";
-
-
 
 // const prisma = new PrismaClient().$extends({
 //     query: {

@@ -20,7 +20,6 @@ import { apiRouter } from '../routes';
 
 import type { RequestHandler } from 'express';
 
-
 export const createApp = () => {
   const app = express();
 
@@ -39,13 +38,16 @@ export const createApp = () => {
   app.use(express.urlencoded({ extended: false }) as unknown as RequestHandler);
   app.use(requestContext);
 
+  
   app.get('/', (_req, res) => {
     sendResponse(res, 200, {
       success: true,
       message: 'api work file',
     });
   });
-  app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+
+
+  app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
   app.use('/docs', swaggerUi.serve, swaggerUi.setup(openApiDocument));
   app.use('/api/v1', apiRouter);
   app.use(notFound);

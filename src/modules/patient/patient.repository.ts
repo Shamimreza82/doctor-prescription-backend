@@ -3,15 +3,11 @@ import { Prisma } from '@prisma/client';
 import { prisma } from '@/bootstrap/prisma';
 
 const patientInclude = {
-  addresses: {
-    where: {
-      isPrimary: true,
-    },
-    orderBy: {
-      createdAt: 'asc',
-    },
-    take: 1,
-  },
+  addresses: true,
+  emergencyContacts: true,
+  medicalProfile: true,
+  insurances: true,
+  identifiers: true,
 } satisfies Prisma.PatientInclude;
 
 const createPatient = async (data: Prisma.PatientCreateInput) => {
@@ -26,9 +22,15 @@ const findFirstPatient = async (where: Prisma.PatientWhereInput) => {
     where,
     include: {
       ...patientInclude,
-      addresses: true,
-      prescriptions: true
-    }
+      prescriptions: {
+        take: 5,
+        orderBy: { createdAt: 'desc' },
+      },
+      visits: {
+        take: 5,
+        orderBy: { visitDate: 'desc' },
+      },
+    },
   });
 };
 
@@ -44,7 +46,12 @@ const listPatients = async (
       orderBy,
       skip,
       take,
-      include: patientInclude,
+      include: {
+        addresses: {
+          where: { isPrimary: true },
+          take: 1,
+        },
+      },
     }),
     prisma.patient.count({ where }),
   ]);
@@ -52,42 +59,53 @@ const listPatients = async (
   return { data, total };
 };
 
-const updatePatient = async (
-  patientId: string,
-  data: Prisma.PatientUpdateInput,
-  primaryAddress?: string | null,
+const updatePatient = async (patientId: string, data: Prisma.PatientUpdateInput) => {
+  return prisma.patient.update({
+    where: { id: patientId },
+    data,
+    include: patientInclude,
+  });
+};
+
+// Visit Repository Methods
+const createVisit = async (data: Prisma.VisitCreateInput) => {
+  return prisma.visit.create({
+    data,
+  });
+};
+
+const listVisits = async (
+  where: Prisma.VisitWhereInput,
+  orderBy: Prisma.VisitOrderByWithRelationInput[],
+  skip: number,
+  take: number,
 ) => {
-  return prisma.$transaction(async (tx) => {
-    await tx.patient.update({
-      where: { id: patientId },
-      data,
-      include: patientInclude,
-    });
+  const [data, total] = await Promise.all([
+    prisma.visit.findMany({
+      where,
+      orderBy,
+      skip,
+      take,
+    }),
+    prisma.visit.count({ where }),
+  ]);
 
-    if (primaryAddress !== undefined) {
-      await tx.patientAddress.deleteMany({
-        where: {
-          patientId,
-          isPrimary: true,
-        },
-      });
+  return { data, total };
+};
 
-      if (primaryAddress) {
-        await tx.patientAddress.create({
-          data: {
-            patientId,
-            type: 'HOME',
-            addressLine: primaryAddress,
-            isPrimary: true,
-          },
-        });
-      }
-    }
+const findVisitById = async (visitId: string, patientId: string) => {
+  return prisma.visit.findFirst({
+    where: {
+      id: visitId,
+      patientId,
+    },
+  });
+};
 
-    return tx.patient.findUniqueOrThrow({
-      where: { id: patientId },
-      include: patientInclude,
-    });
+const updateVisit = async (visitId: string, data: Prisma.VisitUpdateInput) => {
+  return prisma.visit.update({
+    where: { id: visitId },
+    data,
   });
 };
 
@@ -96,4 +114,8 @@ export const PatientRepository = {
   findFirstPatient,
   listPatients,
   updatePatient,
+  createVisit,
+  listVisits,
+  findVisitById,
+  updateVisit,
 };

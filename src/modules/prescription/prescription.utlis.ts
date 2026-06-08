@@ -1,11 +1,16 @@
-import { Prisma } from "@prisma/client";
-import { StatusCodes } from "http-status-codes";
+import { Prisma } from '@prisma/client';
+import { StatusCodes } from 'http-status-codes';
 
-import { AppError } from "@/shared/errors/AppError";
+import { AppError } from '@/shared/errors/AppError';
 
-import { PRESCRIPTION_MESSAGES } from "./prescription.constants";
-import { PrescriptionRepository } from "./prescription.repository";
-import { TPrescriptionActor, TPrescriptionItemInput, TPrescriptionListQuery, TPrescriptionScope } from "./prescription.types";
+import { PRESCRIPTION_MESSAGES } from './prescription.constants';
+import { PrescriptionRepository } from './prescription.repository';
+import {
+  TPrescriptionActor,
+  TPrescriptionItemInput,
+  TPrescriptionListQuery,
+  TPrescriptionScope,
+} from './prescription.types';
 
 const resolveTenantScope = (
   actor: TPrescriptionActor,
@@ -47,22 +52,22 @@ const buildTenantWhere = (scope: TPrescriptionScope): Prisma.PrescriptionWhereIn
 const buildPrescriptionNumber = () => `RX-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
 
 const mapItems = (items: TPrescriptionItemInput[] = []) =>
-  items.map((item, index): Prisma.PrescriptionItemCreateWithoutPrescriptionInput => ({
-    medicineName: item.medicineName,
-    genericName: item.genericName ?? null,
-    dosage: item.dosage ?? null,
-    frequency: item.frequency ?? null,
-    durationValue: item.durationValue ?? null,
-    durationUnit: item.durationUnit ?? null,
-    route: item.route ?? null,
-    instruction: item.instruction ?? null,
-    quantity: item.quantity ?? null,
-    timing: item.timing ?? null,
-    sortOrder: item.sortOrder ?? index,
-    metadata: item.metadata,
-  }));
-
-  
+  items.map(
+    (item, index): Prisma.PrescriptionItemCreateWithoutPrescriptionInput => ({
+      medicineName: item.medicineName,
+      genericName: item.genericName ?? null,
+      dosage: item.dosage ?? null,
+      frequency: item.frequency ?? null,
+      durationValue: item.durationValue ?? null,
+      durationUnit: item.durationUnit ?? null,
+      route: item.route ?? null,
+      instruction: item.instruction ?? null,
+      quantity: item.quantity ?? null,
+      timing: item.timing ?? null,
+      sortOrder: item.sortOrder ?? index,
+      metadata: item.metadata,
+    }),
+  );
 
 const getPatientOrThrow = async (patientId: string, scope: TPrescriptionScope) => {
   if (!scope.tenantId) {
@@ -78,8 +83,6 @@ const getPatientOrThrow = async (patientId: string, scope: TPrescriptionScope) =
   return patient;
 };
 
-
-
 const getDoctorIdOrThrow = async (
   actor: TPrescriptionActor,
   scope: TPrescriptionScope,
@@ -89,7 +92,6 @@ const getDoctorIdOrThrow = async (
     throw new AppError(StatusCodes.BAD_REQUEST, PRESCRIPTION_MESSAGES.TENANT_REQUIRED);
   }
   console.log('Resolved tenant scope for doctor lookup:', actor);
-
 
   if (actor.role === 'DOCTOR') {
     const doctor = await PrescriptionRepository.findDoctorByUserId(actor.userId, scope.tenantId);
@@ -116,14 +118,7 @@ const getDoctorIdOrThrow = async (
   return doctor.id;
 };
 
-
-
-
-
-const validateVisitOrThrow = async (
-  visitId: string,
-  patientId: string,
-) => {
+const validateVisitOrThrow = async (visitId: string, patientId: string) => {
   const visit = await PrescriptionRepository.findVisitById(visitId);
 
   if (visit?.patientId !== patientId) {
@@ -146,7 +141,6 @@ const getScopedPrescriptionOrThrow = async (prescriptionId: string, scope: TPres
 
   return prescription;
 };
-
 
 const buildPrescriptionListWhere = (
   scope: TPrescriptionScope,
@@ -229,10 +223,6 @@ const buildOrderBy = (
   return [{ createdAt: sortOrder }];
 };
 
-
-
-
-
 export const PrescriptionUtils = {
   resolveTenantScope,
   buildTenantWhere,
@@ -245,4 +235,3 @@ export const PrescriptionUtils = {
   buildPrescriptionListWhere,
   buildOrderBy,
 };
-

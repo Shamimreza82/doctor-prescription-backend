@@ -7,15 +7,9 @@ import { PRESCRIPTION_MESSAGES } from './prescription.constants';
 import { PrescriptionServices } from './prescription.service';
 
 import type { TPrescriptionCreateInput, TPrescriptionUpdateInput } from './prescription.types';
-import type {
-  TListPrescriptionsValidationInput,
-} from './prescription.validation';
-
-
-
+import type { TListPrescriptionsValidationInput } from './prescription.validation';
 
 const createPrescription = catchAsync(async (req, res) => {
-
   const result = await PrescriptionServices.createPrescription(
     req.user,
     req.body as TPrescriptionCreateInput,
@@ -43,7 +37,10 @@ const listPrescriptions = catchAsync(async (req, res) => {
 });
 
 const getPrescriptionById = catchAsync(async (req, res) => {
-  const result = await PrescriptionServices.getPrescriptionById(req.user, req.params['id'] as string);
+  const result = await PrescriptionServices.getPrescriptionById(
+    req.user,
+    req.params['id'] as string,
+  );
 
   sendResponse(res, StatusCodes.OK, {
     success: true,
@@ -67,7 +64,10 @@ const updatePrescription = catchAsync(async (req, res) => {
 });
 
 const archivePrescription = catchAsync(async (req, res) => {
-  const result = await PrescriptionServices.archivePrescription(req.user, req.params['id'] as string);
+  const result = await PrescriptionServices.archivePrescription(
+    req.user,
+    req.params['id'] as string,
+  );
 
   sendResponse(res, StatusCodes.OK, {
     success: true,
@@ -77,7 +77,7 @@ const archivePrescription = catchAsync(async (req, res) => {
 });
 
 const generatePdfPrescription = catchAsync(async (req, res) => {
-  const { id: prescriptionId } = req.params as { id: string } ;
+  const { id: prescriptionId } = req.params as { id: string };
   const user = req.user;
 
   const result = await PrescriptionServices.generatePdf(user, prescriptionId);
@@ -90,7 +90,7 @@ const generatePdfPrescription = catchAsync(async (req, res) => {
 });
 
 const downloadPdfPrescription = catchAsync(async (req, res) => {
-    const { id: prescriptionId } = req.params as { id: string } ;
+  const { id: prescriptionId } = req.params as { id: string };
 
   const file = await PrescriptionServices.getPdfFilePath(prescriptionId);
 
@@ -98,20 +98,17 @@ const downloadPdfPrescription = catchAsync(async (req, res) => {
 });
 
 const viewPdfPrescription = catchAsync(async (req, res) => {
-   const { id: prescriptionId } = req.params as { id: string } ;
+  const { id: prescriptionId } = req.params as { id: string };
 
   const file = await PrescriptionServices.getPdfFilePath(prescriptionId);
 
-  console.log(file)
+  console.log(file);
 
   res.setHeader('Content-Type', 'application/pdf');
   res.setHeader('Content-Disposition', `inline; filename="${file.fileName}"`);
 
   res.sendFile(file.filePath);
 });
-
-
-
 
 export const PrescriptionControllers = {
   createPrescription,

@@ -1,16 +1,16 @@
-import { prisma } from "@/bootstrap/prisma";
+import { prisma } from '@/bootstrap/prisma';
 
 import { seedPlans } from './seed/plan.seed';
 import { seedSuperAdmin } from './seed/superAdmin.seed';
 
 async function main() {
   await seedSuperAdmin();
-  await seedPlans()
+  await seedPlans();
 }
 
 main()
   .then(() => {
-   console.info("🌱 Seeding completed");
+    console.info('🌱 Seeding completed');
   })
   .catch((e) => {
     console.error(e);

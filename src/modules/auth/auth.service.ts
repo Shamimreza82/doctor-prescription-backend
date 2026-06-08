@@ -18,8 +18,6 @@ import {
 } from './auth.utils';
 import { TLoginInput, TRegisterInput } from './auth.validation';
 
-
-
 const register = async (payload: TRegisterInput) => {
   const { email, password } = payload;
   const existingUser = await findUserByEmail(email);
@@ -36,9 +34,6 @@ const register = async (payload: TRegisterInput) => {
 
   return createAuthUser(data);
 };
-
-
-
 
 const login = async (payload: TLoginInput) => {
   const { email, password } = payload;
@@ -120,5 +115,4 @@ export const AuthServices = {
   register,
   refreshToken,
   me,
-};    
-
+};

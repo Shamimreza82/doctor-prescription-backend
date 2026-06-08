@@ -1,11 +1,9 @@
-
 import { RequestHandler } from 'express';
 
 import { assertActiveUser, findUserById, verifyAccessToken } from '@/modules/auth/auth.utils';
 import { Role } from '@/shared/constend/auth.const';
 import { AppError } from '@/shared/errors/AppError';
 import { catchAsync } from '@/shared/utils/catchAsync';
-
 
 export const auth = (...allowedRoles: Role[]): RequestHandler =>
   catchAsync(async (req, _res, next) => {
@@ -37,8 +35,8 @@ export const auth = (...allowedRoles: Role[]): RequestHandler =>
       role: user.role as Role,
     };
 
-       // ✅ 🔥 SUPER ADMIN BYPASS
-    if (req.user.role as Role === Role.SUPER_ADMIN) {
+    // ✅ 🔥 SUPER ADMIN BYPASS
+    if ((req.user.role as Role) === Role.SUPER_ADMIN) {
       return next();
     }
 

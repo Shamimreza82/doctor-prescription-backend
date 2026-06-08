@@ -42,10 +42,9 @@ const createPrescriptionSchema = z.object({
 });
 
 const updatePrescriptionSchema = z.object({
-  body: prescriptionBodySchema.partial().refine(
-    (value) => Object.keys(value).length > 0,
-    'At least one field is required for update',
-  ),
+  body: prescriptionBodySchema
+    .partial()
+    .refine((value) => Object.keys(value).length > 0, 'At least one field is required for update'),
 });
 
 const prescriptionParamsSchema = z.object({
@@ -53,7 +52,6 @@ const prescriptionParamsSchema = z.object({
     id: z.uuid('Invalid prescription ID'),
   }),
 });
-
 
 const listPrescriptionsSchema = z.object({
   query: z
@@ -77,10 +75,9 @@ export const PrescriptionValidationSchemas = {
   createPrescriptionSchema,
   updatePrescriptionSchema,
   prescriptionParamsSchema,
-  listPrescriptionsSchema
+  listPrescriptionsSchema,
 };
 
 export type TCreatePrescriptionValidationInput = z.infer<typeof createPrescriptionSchema>['body'];
 export type TUpdatePrescriptionValidationInput = z.infer<typeof updatePrescriptionSchema>['body'];
 export type TListPrescriptionsValidationInput = z.infer<typeof listPrescriptionsSchema>['query'];
-

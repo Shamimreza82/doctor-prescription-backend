@@ -54,7 +54,6 @@ const envSchema = z.object({
   OLLAMA_TEXT_MODEL: z.string().optional(),
   OLLAMA_VISION_MODEL: z.string().optional(),
   OLLAMA_EMBEDDING_MODEL: z.string().optional(),
-
 });
 
 const parsed = envSchema.safeParse(process.env);

@@ -1,13 +1,16 @@
-import { Prisma } from "@prisma/client";
-import { StatusCodes } from "http-status-codes";
+import { Prisma } from '@prisma/client';
+import { StatusCodes } from 'http-status-codes';
 
-import { AppError } from "@/shared/errors/AppError";
+import { AppError } from '@/shared/errors/AppError';
 
-import { PATIENT_MESSAGES } from "./patient.constants";
-import { PatientRepository } from "./patient.repository";
-import { TPatientActor, TPatientListQuery, TPatientScope} from "./patient.types";
+import { PATIENT_MESSAGES } from './patient.constants';
+import { PatientRepository } from './patient.repository';
+import { TPatientActor, TPatientListQuery, TPatientScope } from './patient.types';
 
-const resolveTenantScope = (actor: TPatientActor, requestedTenantId?: string,):{ tenantId?: string; isSuperAdmin: boolean } => {
+const resolveTenantScope = (
+  actor: TPatientActor,
+  requestedTenantId?: string,
+): { tenantId?: string; isSuperAdmin: boolean } => {
   const isSuperAdmin = actor.role === 'SUPER_ADMIN';
 
   if (isSuperAdmin) {
@@ -132,8 +135,6 @@ const getScopedPatientOrThrow = async (patientId: string, scope: TPatientScope) 
 
   return patient;
 };
-
-
 
 export const PatientUtils = {
   resolveTenantScope,

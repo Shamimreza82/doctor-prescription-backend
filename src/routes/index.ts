@@ -18,13 +18,6 @@ apiRouter.use('/patients', patientRoutes);
 apiRouter.use('/prescriptions', prescriptionRoutes);
 apiRouter.use('/files', uploadRouter);
 
-
-
-
-
-
-
-
 // apiRouter.use('/auth', authRoutes);
 // apiRouter.use('/doctors', doctorRoutes);
 // apiRouter.use('/patients', patientRoutes);

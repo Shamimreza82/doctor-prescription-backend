@@ -1,11 +1,15 @@
 Follow:
+
 - docs/ai-prompts/AGENTS.md
 
 ## Goal
+
 Implement a complete Patient module for a multi-tenant SaaS backend.
 
 ## Context
+
 This system supports:
+
 - Super Admin
 - Doctor
 - Assistant
@@ -21,6 +25,7 @@ Doctors and authorized assistants can manage patients within their tenant.
 Build a full Patient module with:
 
 ### Core Features
+
 - Create patient
 - List patients (with pagination)
 - Search patients (name, phone)
@@ -29,12 +34,14 @@ Build a full Patient module with:
 - Soft delete / archive patient
 
 ### Query Features
+
 - pagination (page, limit)
 - search (name, phone)
 - sort (createdAt, name)
 - filters (optional)
 
 ## Business Rules
+
 - Every patient MUST have `tenantId`
 - Doctor can only access their own tenant patients
 - Assistant can access based on role (assume allowed for now)
@@ -42,6 +49,7 @@ Build a full Patient module with:
 - No cross-tenant data access allowed
 
 ## Architecture Rules
+
 - Keep controller thin
 - Put all business logic in service
 - Use repository if query becomes complex
@@ -49,12 +57,15 @@ Build a full Patient module with:
 - Follow existing module structure
 
 ## Validation Rules
+
 Use Zod:
+
 - validate body
 - validate params
 - validate query
 
 Example fields:
+
 - name (string, required)
 - phone (string, required)
 - age (number, optional)
@@ -62,12 +73,14 @@ Example fields:
 - address (optional)
 
 ## Multi-Tenant Safety
+
 - Always filter by tenantId in queries
 - Never trust frontend tenant filtering
 - Use `req.user.tenantId`
 - Super admin bypass must be explicit
 
 ## Authorization
+
 - Auth middleware already exists
 - Assume roles:
   - SUPER_ADMIN
@@ -90,31 +103,35 @@ Create or update:
 - patient.types.ts
 - patient.constants.ts
 
-if  need you can create your wone make sure its relavent
+if need you can create your wone make sure its relavent
 
 ## Route Structure
 
-- POST   /api/v1/patients
-- GET    /api/v1/patients
-- GET    /api/v1/patients/:id
-- PATCH  /api/v1/patients/:id
+- POST /api/v1/patients
+- GET /api/v1/patients
+- GET /api/v1/patients/:id
+- PATCH /api/v1/patients/:id
 - DELETE /api/v1/patients/:id
 
-if  need you can create your wone make sure its relavent
+if need you can create your wone make sure its relavent
+
 ## Implementation Rules
 
 Controller:
+
 - receive request
 - call service
 - send response
 
 Service:
+
 - handle business logic
 - enforce tenant boundary
 - handle pagination/search
 - handle role-based access
 
 Repository (optional):
+
 - handle Prisma queries
 - reusable queries
 
@@ -130,6 +147,7 @@ Repository (optional):
 ## Verification Checklist
 
 Confirm that:
+
 - patient creation works
 - list is paginated
 - search works

@@ -28,8 +28,7 @@ export const startServer = async (): Promise<Server> => {
   // await getPrisma().$connect();
 
   const server = app.listen(appConfig.port, appConfig.host, () => {
-    console.info(
-      {
+    console.info({
         event: 'SERVER_START',
         host: appConfig.host,
         port: appConfig.port,

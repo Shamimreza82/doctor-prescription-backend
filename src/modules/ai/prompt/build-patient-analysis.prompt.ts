@@ -1,5 +1,3 @@
-
-
 interface PatientData {
   firstName: string;
   lastName?: string;
@@ -28,8 +26,6 @@ const calculateAge = (dob: string) => {
   return age;
 };
 
-
-
 export const buildPatientAnalysisPrompt = (patient: PatientData) => `
 You are a professional medical assistant AI.
 
@@ -43,7 +39,7 @@ Analyze the following patient data and provide a structured clinical summary.
 
 ------------------------
 👤 Patient Information:
-- Name: ${patient.firstName} ${patient.lastName ?? ""}
+- Name: ${patient.firstName} ${patient.lastName ?? ''}
 - Gender: ${patient.gender}
 - Age: ${calculateAge(patient.dateOfBirth)} years
 - Blood Group: ${patient.bloodGroup}
@@ -55,10 +51,10 @@ Analyze the following patient data and provide a structured clinical summary.
 - Email: ${patient.email}
 
 📍 Address:
-- ${patient.addresses?.[0]?.addressLine ?? "N/A"}
+- ${patient.addresses?.[0]?.addressLine ?? 'N/A'}
 
 📝 Notes:
-- ${patient.notes ?? "No notes"}
+- ${patient.notes ?? 'No notes'}
 
 ------------------------
 
@@ -86,5 +82,3 @@ Analyze the following patient data and provide a structured clinical summary.
   "followUp": ["string"]
 }
 `;
-
-

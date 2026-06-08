@@ -5,13 +5,11 @@ import { validateRequest } from '@/middlewares/validateRequest';
 import { Role } from '@/shared/constend/auth.const';
 import { MulterConfig } from '@/shared/utils/multer';
 
-import {  UPLOAD_FIELD_NAME } from './upload.constand';
+import { UPLOAD_FIELD_NAME } from './upload.constand';
 import { UploadControllers } from './upload.controller';
 import { UploadValidationSchemas } from './upload.validation';
 
 const router = Router();
-
-
 
 router.use(auth(Role.DOCTOR, Role.ASSISTANT));
 

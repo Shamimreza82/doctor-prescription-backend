@@ -1,11 +1,10 @@
-import { Role, UserStatus, TenantStatus } from "@prisma/client";
-import bcrypt from "bcrypt";
+import { Role, UserStatus, TenantStatus } from '@prisma/client';
+import bcrypt from 'bcrypt';
 
-import { prisma } from "@/bootstrap/prisma";
-
+import { prisma } from '@/bootstrap/prisma';
 
 export const seedSuperAdmin = async () => {
-  const email = "admin@system.com";
+  const email = 'admin@system.com';
 
   // 1. Check exists
   const existing = await prisma.user.findUnique({
@@ -13,33 +12,33 @@ export const seedSuperAdmin = async () => {
   });
 
   if (existing) {
-    console.info("✅ Super Admin already exists");
+    console.info('✅ Super Admin already exists');
     return;
   }
 
   // 2. Hash password
-  const hashedPassword = await bcrypt.hash("123456", 10);
+  const hashedPassword = await bcrypt.hash('123456', 10);
 
   // 3. Create Super Admin
   const superAdmin = await prisma.user.create({
     data: {
-      name: "Super Admin",
+      name: 'Super Admin',
       email,
       password: hashedPassword,
       role: Role.SUPER_ADMIN,
       status: UserStatus.ACTIVE,
       tenantId: null, // 🔥 important (platform-level user)
       emailVerified: true,
-      createdBy: "system",
+      createdBy: 'system',
     },
   });
 
   // 4. Create Tenant (System Tenant)
   const tenant = await prisma.tenant.create({
     data: {
-      name: "System Tenant",
-      slug: "system-tenant",
-      code: "SYS-001",
+      name: 'System Tenant',
+      slug: 'system-tenant',
+      code: 'SYS-001',
       status: TenantStatus.ACTIVE,
 
       ownerUserId: superAdmin.id,
@@ -48,7 +47,7 @@ export const seedSuperAdmin = async () => {
       activatedAt: new Date(),
 
       metadata: {
-        type: "SYSTEM",
+        type: 'SYSTEM',
       },
     },
   });
@@ -57,9 +56,9 @@ export const seedSuperAdmin = async () => {
   await prisma.tenantSetting.create({
     data: {
       tenantId: tenant.id,
-      timezone: "Asia/Dhaka",
-      currency: "BDT",
-      language: "en",
+      timezone: 'Asia/Dhaka',
+      currency: 'BDT',
+      language: 'en',
     },
   });
 
@@ -72,5 +71,5 @@ export const seedSuperAdmin = async () => {
   //   data: { tenantId: tenant.id },
   // });
 
-  console.info("🚀 Super Admin + Tenant created successfully");
+  console.info('🚀 Super Admin + Tenant created successfully');
 };

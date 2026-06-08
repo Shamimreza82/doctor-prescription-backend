@@ -7,9 +7,6 @@ import { Role } from '@/shared/constend/auth.const';
 import { AuthControllers } from './auth.controller';
 import { AuthValidationSchemas } from './auth.validation';
 
-
-
-
 const router = Router();
 
 router.post(
@@ -19,16 +16,10 @@ router.post(
   AuthControllers.register,
 );
 
-router.post('/login', 
-  validateRequest(AuthValidationSchemas.loginSchema), 
-  AuthControllers.login);
+router.post('/login', validateRequest(AuthValidationSchemas.loginSchema), AuthControllers.login);
 
-router.post('/refresh-token', 
-  AuthControllers.refreshToken);
+router.post('/refresh-token', AuthControllers.refreshToken);
 
 router.get('/me', auth(), AuthControllers.me);
 
-  
-
 export const authRoutes = router;
-

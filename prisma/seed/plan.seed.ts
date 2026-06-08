@@ -2,7 +2,6 @@ import { BillingCycle } from '@prisma/client';
 
 import { prisma } from '@/bootstrap/prisma';
 
-
 export const seedPlans = async () => {
   const plans = [
     {

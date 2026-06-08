@@ -4,7 +4,8 @@ export const authPaths = {
       tags: ['Auth'],
       summary: 'Register a new user',
       security: [{ bearerAuth: [] }],
-      description: 'Creates a user account. This route is currently restricted to SUPER_ADMIN users.',
+      description:
+        'Creates a user account. This route is currently restricted to SUPER_ADMIN users.',
       requestBody: {
         required: true,
         content: {

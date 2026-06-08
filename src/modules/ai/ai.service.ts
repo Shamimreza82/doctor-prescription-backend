@@ -1,4 +1,4 @@
-import { getAiProvider } from "./ai.registry";
+import { getAiProvider } from './ai.registry';
 
 import type {
   TAiProvider,
@@ -7,32 +7,32 @@ import type {
   TTextInput,
   TImageGenerateInput,
   TImageUnderstandInput,
-} from "./ai.types";
+} from './ai.types';
 
 export const generateText = async (
   provider: TAiProvider,
-  input: TTextInput
+  input: TTextInput,
 ): Promise<TAiResponse> => {
   return getAiProvider(provider).text(input);
 };
 
 export const generateChat = async (
   provider: TAiProvider,
-  input: TChatInput
+  input: TChatInput,
 ): Promise<TAiResponse> => {
   return getAiProvider(provider).chat(input);
 };
 
 export const generateImage = async (
   provider: TAiProvider,
-  input: TImageGenerateInput
+  input: TImageGenerateInput,
 ): Promise<TAiResponse> => {
   return getAiProvider(provider).generateImage(input);
 };
 
 export const understandImage = async (
   provider: TAiProvider,
-  input: TImageUnderstandInput
+  input: TImageUnderstandInput,
 ): Promise<TAiResponse> => {
   return getAiProvider(provider).understandImage(input);
 };

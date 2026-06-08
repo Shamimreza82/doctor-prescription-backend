@@ -11,7 +11,11 @@ const router = Router();
 
 // Public or Shared Routes
 router.get('/', auth(Role.SUPER_ADMIN, Role.DOCTOR, Role.ASSISTANT), DoctorControllers.listDoctors);
-router.get('/:id', auth(Role.SUPER_ADMIN, Role.DOCTOR, Role.ASSISTANT, Role.PATIENT), DoctorControllers.getDoctorById);
+router.get(
+  '/:id',
+  auth(Role.SUPER_ADMIN, Role.DOCTOR, Role.ASSISTANT, Role.PATIENT),
+  DoctorControllers.getDoctorById,
+);
 
 // Doctor Only Routes (Personal Profile Management)
 router.get('/me/profile', auth(Role.DOCTOR), DoctorControllers.getMyProfile);

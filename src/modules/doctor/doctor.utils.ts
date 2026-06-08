@@ -16,7 +16,7 @@ export const DoctorUtils = {
   },
 
   async getScopedDoctorOrThrow(userId: string, tenantId?: string) {
-    // If tenantId is provided, we filter by it. 
+    // If tenantId is provided, we filter by it.
     // If not (e.g. Super Admin), we just find by userId.
     const doctor = await DoctorRepository.findByUserId(userId, tenantId);
     if (!doctor) {
@@ -64,5 +64,5 @@ export const DoctorUtils = {
     order[field] = direction;
 
     return order;
-  }
+  },
 };

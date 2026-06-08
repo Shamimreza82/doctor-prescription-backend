@@ -94,7 +94,8 @@ export const rolePaths = {
     post: {
       tags: ['Roles'],
       summary: 'Assign permissions to a role',
-      description: 'Requires authentication. The current route does not apply a separate permission middleware.',
+      description:
+        'Requires authentication. The current route does not apply a separate permission middleware.',
       security: [{ bearerAuth: [] }],
       parameters: [
         {

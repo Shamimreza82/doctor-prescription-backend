@@ -43,7 +43,8 @@ export const patientPaths = {
     get: {
       tags: ['Patients'],
       summary: 'List patients',
-      description: 'Returns a paginated list of patients for the authenticated doctor or assistant tenant scope.',
+      description:
+        'Returns a paginated list of patients for the authenticated doctor or assistant tenant scope.',
       security: [{ bearerAuth: [] }],
       parameters: [
         {
