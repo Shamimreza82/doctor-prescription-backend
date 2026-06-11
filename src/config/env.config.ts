@@ -21,11 +21,18 @@ const envSchema = z.object({
   RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(60_000),
   RATE_LIMIT_MAX_REQUESTS: z.coerce.number().int().positive().default(120),
   JWT_ACCESS_SECRET: z.string().min(16).default('dev-access-secret-change-me'),
-  JWT_REFRESH_SECRET: z.string().min(16).default('dev-refress-secret-change-me'),
+  JWT_REFRESH_SECRET: z.string().min(16).default('dev-refresh-secret-change-me'),
   JWT_ACCESS_EXPIRES_IN: z.string().min(1).default('15m'),
   JWT_REFRESH_EXPIRES_IN: z.string().min(1).default('365d'),
+  NODE_MAILER_EMAIL: z.string().email().default('shamimrezabd67@gmail.com'),
+  NODE_MAILER_PASS: z.string().default('ubrq yrlb wicu oubn'),
+  CLIENT_URL: z.string().url().default('http://localhost:3000'),
+  EMAIL_SECRET: z.string().min(16).default('dev-email-secret-change-me'),
+
+
   LOG_LEVEL: z.enum(['trace', 'debug', 'info', 'warn', 'error', 'fatal']).default('info'),
   HTTP_LOG_LEVEL: z.enum(['trace', 'debug', 'info', 'warn', 'error', 'fatal']).default('info'),
+
 
   // Ai models and api keys
   GEMINI_API_KEY: z.string().optional(),
@@ -82,6 +89,10 @@ export const envConfig = {
   jwtRefreshSecret: parsed.data.JWT_REFRESH_SECRET,
   jwtRefreshExpiresIn: parsed.data.JWT_REFRESH_EXPIRES_IN,
 
+  nodeMailerEmail: parsed.data.NODE_MAILER_EMAIL,
+  nodeMailerPass: parsed.data.NODE_MAILER_PASS,
+  clientUrl: parsed.data.CLIENT_URL,
+  emailSecret: parsed.data.EMAIL_SECRET,
   logLevel: parsed.data.LOG_LEVEL as LogLevel,
   httpLogLevel: parsed.data.HTTP_LOG_LEVEL as LogLevel,
   corsEnabled: parsed.data.CORS_ENABLED,

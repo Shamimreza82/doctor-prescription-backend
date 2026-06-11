@@ -1,9 +1,13 @@
 import { StatusCodes } from 'http-status-codes';
+import jwt from 'jsonwebtoken';
 
+import { prisma } from '@/bootstrap/prisma';
+import { envConfig } from '@/config/env.config';
 import { AppError } from '@/shared/errors/AppError';
-import { generateId } from '@/shared/utils/generateId';
+import { createEmailToken } from '@/shared/utils/createEmailToken';
 import { comparePassword } from '@/shared/utils/passwordCompare';
 import { hashPassword } from '@/shared/utils/passwordHased';
+import sendEmail from '@/shared/utils/sendEmail';
 
 import { AUTH_MESSAGES } from './auth.consted';
 import {
@@ -17,6 +21,9 @@ import {
   verifyRefreshToken,
 } from './auth.utils';
 import { TLoginInput, TRegisterInput } from './auth.validation';
+import { verifyEmailTemplate } from './emailTemplate/VerifyLink';
+
+
 
 const register = async (payload: TRegisterInput) => {
   const { email, password } = payload;
@@ -27,13 +34,27 @@ const register = async (payload: TRegisterInput) => {
   }
 
   const data: TRegisterInput = {
-    publicId: generateId('usr'),
     ...payload,
     password: await hashPassword(password),
   };
 
-  return createAuthUser(data);
+  const createdUser = await createAuthUser(data);
+
+    if (! createdUser.emailVerified) {
+    const token = createEmailToken(createdUser.id);
+    const link = `${envConfig.clientUrl}/auth/verify-email?token=${token}`;
+    const emailTemplate = verifyEmailTemplate(link);
+
+    await sendEmail(createdUser.email, 'Verify your email', emailTemplate);
+    console.log('email send successfull');
+  }
+
+
+  return createdUser
 };
+
+
+
 
 const login = async (payload: TLoginInput) => {
   const { email, password } = payload;
@@ -110,9 +131,33 @@ const me = async (userId: string) => {
   };
 };
 
+
+const verifyEmail = async (token: string) => {
+  const decoded = jwt.verify(token, envConfig.emailSecret) as {
+    userId: string;
+    id: string
+  };
+  console.log(decoded);
+  const user = await findUserById(decoded.userId);
+
+
+  if (!user) {
+    throw new AppError(404, 'User not found');
+  }
+  await prisma.user.update({
+    where: { id: decoded.userId },
+    data: { emailVerified: true },
+  });
+
+  return { message: 'Email verified successfully' };
+};
+
+
+
 export const AuthServices = {
   login,
   register,
   refreshToken,
   me,
+  verifyEmail,
 };

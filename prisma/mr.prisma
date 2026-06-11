@@ -32,6 +32,8 @@ model MRProfile {
   @@map("mr_profiles")
 }
 
+
+
 model MRDoctorAssignment {
   id String @id @default(uuid()) @map("id")
 

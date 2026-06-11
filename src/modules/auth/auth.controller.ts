@@ -1,5 +1,6 @@
 import { StatusCodes } from 'http-status-codes';
 
+import { envConfig } from '@/config/env.config';
 import { catchAsync } from '@/shared/utils/catchAsync';
 import { sendResponse } from '@/shared/utils/sendResponse';
 
@@ -62,9 +63,25 @@ const me = catchAsync(async (req, res) => {
   });
 });
 
+
+const verifyEmail = catchAsync(async (req, res) => {
+  const token = req.query["token"] as string;
+
+  const result = await AuthServices.verifyEmail(token);
+    console.log(result);
+  if (!result) {
+    res.redirect(`${envConfig.clientUrl}/verify-error`);
+  } else {
+    res.redirect(`${envConfig.clientUrl}/verification-success`);
+  }
+});
+
+
+
 export const AuthControllers = {
   login,
   register,
   refreshToken,
   me,
+  verifyEmail,
 };
